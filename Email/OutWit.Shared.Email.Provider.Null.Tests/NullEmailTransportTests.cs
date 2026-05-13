@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OutWit.Common.Email;
-using OutWit.Shared.Email.Plugin.Null;
+using OutWit.Shared.Email.Provider.Null;
 
-namespace OutWit.Shared.Email.Plugin.Null.Tests
+namespace OutWit.Shared.Email.Provider.Null.Tests
 {
     [TestFixture]
     public class NullEmailTransportTests

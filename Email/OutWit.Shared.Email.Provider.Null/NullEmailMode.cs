@@ -1,4 +1,4 @@
-namespace OutWit.Shared.Email.Plugin.Null
+namespace OutWit.Shared.Email.Provider.Null
 {
     /// <summary>
     /// Behaviour mode for the Null email transport.

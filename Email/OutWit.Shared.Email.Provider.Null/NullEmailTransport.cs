@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using OutWit.Common.Email;
 
-namespace OutWit.Shared.Email.Plugin.Null
+namespace OutWit.Shared.Email.Provider.Null
 {
     /// <summary>
     /// Fallback <see cref="IEmailTransport"/> for deployments that don't have an

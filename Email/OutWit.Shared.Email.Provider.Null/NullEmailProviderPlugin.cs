@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 using OutWit.Common.Email;
 using OutWit.Common.Plugins.Abstractions;
 using OutWit.Common.Plugins.Abstractions.Attributes;
-using OutWit.Shared.Email.Plugins;
+using OutWit.Shared.Email.Providers;
 
-namespace OutWit.Shared.Email.Plugin.Null
+namespace OutWit.Shared.Email.Provider.Null
 {
     /// <summary>
     /// Fallback email provider — registers <see cref="NullEmailTransport"/> in the

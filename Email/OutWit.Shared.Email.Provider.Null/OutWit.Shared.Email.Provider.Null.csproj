@@ -25,7 +25,7 @@
 		<PackageReadmeFile></PackageReadmeFile>
 		<PackageIcon></PackageIcon>
 
-		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Plugin.Null</RepositoryUrl>
+		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Provider.Null</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -38,7 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\OutWit.Shared.Email.Plugins\OutWit.Shared.Email.Plugins.csproj" />
+		<ProjectReference Include="..\OutWit.Shared.Email.Providers\OutWit.Shared.Email.Providers.csproj" />
 	</ItemGroup>
 
 	<!-- Metadata files (README/NOTICE/LICENSE/OutWit-logo.png) are packed by the

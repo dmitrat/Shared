@@ -8,8 +8,8 @@ on:
         required: true
         type: choice
         options:
-          - OutWit.Shared.Email.Plugins
-          - OutWit.Shared.Email.Plugin.Null
+          - OutWit.Shared.Email.Providers
+          - OutWit.Shared.Email.Provider.Null
 
 permissions:
   contents: read

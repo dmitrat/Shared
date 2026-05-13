@@ -27,12 +27,12 @@ jobs:
         with:
           list-files: json
           filters: |
-            OutWit.Shared.Email.Plugins:
-              - 'Email/OutWit.Shared.Email.Plugins/**'
-            OutWit.Shared.Email.Plugin.Null:
-              - 'Email/OutWit.Shared.Email.Plugin.Null/**'
-              - 'Email/OutWit.Shared.Email.Plugin.Null.Tests/**'
-              - 'Email/OutWit.Shared.Email.Plugins/**'
+            OutWit.Shared.Email.Providers:
+              - 'Email/OutWit.Shared.Email.Providers/**'
+            OutWit.Shared.Email.Provider.Null:
+              - 'Email/OutWit.Shared.Email.Provider.Null/**'
+              - 'Email/OutWit.Shared.Email.Provider.Null.Tests/**'
+              - 'Email/OutWit.Shared.Email.Providers/**'
 
   run-tests:
     name: Test ${{ matrix.project }}

@@ -8,7 +8,7 @@ on:
         required: true
         type: choice
         options:
-          - OutWit.Shared.Email.Plugin.Null
+          - OutWit.Shared.Email.Provider.Null
       configuration:
         description: 'Build configuration'
         required: false

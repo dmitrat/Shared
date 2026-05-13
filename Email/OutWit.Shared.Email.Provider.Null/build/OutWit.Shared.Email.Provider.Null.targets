@@ -2,11 +2,11 @@
 
   <!--
     Auto-imported by NuGet when a host adds a PackageReference to
-    OutWit.Shared.Email.Plugin.Null. Copies the plugin module folder from inside
+    OutWit.Shared.Email.Provider.Null. Copies the plugin module folder from inside
     the package into the host's output, where WitPluginLoader scans @Plugins/.
   -->
 
-  <Target Name="_CopyNullEmailPlugin" AfterTargets="Build">
+  <Target Name="_CopyNullEmailProvider" AfterTargets="Build">
     <ItemGroup>
       <_NullEmailPluginFiles Include="$(MSBuildThisFileDirectory)..\plugins\null.module\**\*" />
     </ItemGroup>
@@ -15,7 +15,7 @@
           SkipUnchangedFiles="true" />
   </Target>
 
-  <Target Name="_CopyNullEmailPluginPublish" AfterTargets="Publish">
+  <Target Name="_CopyNullEmailProviderPublish" AfterTargets="Publish">
     <ItemGroup>
       <_NullEmailPluginPubFiles Include="$(MSBuildThisFileDirectory)..\plugins\null.module\**\*" />
     </ItemGroup>

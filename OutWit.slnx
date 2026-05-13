@@ -14,8 +14,8 @@
     <File Path=".github/workflows/test-one.yml" />
   </Folder>
   <Folder Name="/Email/">
-    <Project Path="Email/OutWit.Shared.Email.Plugin.Null.Tests/OutWit.Shared.Email.Plugin.Null.Tests.csproj" />
-    <Project Path="Email/OutWit.Shared.Email.Plugin.Null/OutWit.Shared.Email.Plugin.Null.csproj" />
-    <Project Path="Email/OutWit.Shared.Email.Plugins/OutWit.Shared.Email.Plugins.csproj" />
+    <Project Path="Email/OutWit.Shared.Email.Provider.Null.Tests/OutWit.Shared.Email.Provider.Null.Tests.csproj" />
+    <Project Path="Email/OutWit.Shared.Email.Provider.Null/OutWit.Shared.Email.Provider.Null.csproj" />
+    <Project Path="Email/OutWit.Shared.Email.Providers/OutWit.Shared.Email.Providers.csproj" />
   </Folder>
 </Solution>

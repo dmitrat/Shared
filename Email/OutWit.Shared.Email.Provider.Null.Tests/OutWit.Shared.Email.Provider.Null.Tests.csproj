@@ -25,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\OutWit.Shared.Email.Plugin.Null\OutWit.Shared.Email.Plugin.Null.csproj" />
+		<ProjectReference Include="..\OutWit.Shared.Email.Provider.Null\OutWit.Shared.Email.Provider.Null.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

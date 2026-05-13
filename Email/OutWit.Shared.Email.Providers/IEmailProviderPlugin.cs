@@ -1,6 +1,6 @@
 using OutWit.Common.Plugins.Abstractions.Interfaces;
 
-namespace OutWit.Shared.Email.Plugins
+namespace OutWit.Shared.Email.Providers
 {
     /// <summary>
     /// Plugin contract for an email provider — a thin marker over <see cref="IWitPlugin"/>

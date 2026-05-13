@@ -1,6 +1,6 @@
-# OutWit.Shared.Email.Plugin.Null
+# OutWit.Shared.Email.Provider.Null
 
-Zero-configuration **fallback** email plugin for OutWit hosts. Lets a host start with a working email pipeline before the operator has signed up for any real provider account. Implements [`IEmailTransport`](https://github.com/dmitrat/Common/tree/main/Email/OutWit.Common.Email) via [`IEmailProviderPlugin`](../OutWit.Shared.Email.Plugins/).
+Zero-configuration **fallback** email plugin for OutWit hosts. Lets a host start with a working email pipeline before the operator has signed up for any real provider account. Implements [`IEmailTransport`](https://github.com/dmitrat/Common/tree/main/Email/OutWit.Common.Email) via [`IEmailProviderPlugin`](../OutWit.Shared.Email.Providers/).
 
 ## Modes
 
@@ -32,7 +32,7 @@ Null__Mode=Drop
 In the host:
 
 ```bash
-dotnet add package OutWit.Shared.Email.Plugin.Null
+dotnet add package OutWit.Shared.Email.Provider.Null
 ```
 
 …then in the host's `Startup`/`Program.cs`:

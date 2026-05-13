@@ -9,7 +9,7 @@
 		<Description>Plugin contract for OutWit email providers. Defines IEmailProviderPlugin (a marker over IWitPlugin) so a host can load Resend / SMTP / SES / SendGrid / etc. transports via WitPluginLoader.</Description>
 		<PackageTags>OutWit;Shared;Email;Plugins;Plugin;Contract</PackageTags>
 
-		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Plugins</RepositoryUrl>
+		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Providers</RepositoryUrl>
 	</PropertyGroup>
 
 	<ItemGroup>

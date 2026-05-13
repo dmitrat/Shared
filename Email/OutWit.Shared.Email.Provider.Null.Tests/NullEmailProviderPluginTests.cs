@@ -2,10 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OutWit.Common.Email;
-using OutWit.Shared.Email.Plugin.Null;
-using OutWit.Shared.Email.Plugins;
+using OutWit.Shared.Email.Provider.Null;
+using OutWit.Shared.Email.Providers;
 
-namespace OutWit.Shared.Email.Plugin.Null.Tests
+namespace OutWit.Shared.Email.Provider.Null.Tests
 {
     [TestFixture]
     public class NullEmailProviderPluginTests
