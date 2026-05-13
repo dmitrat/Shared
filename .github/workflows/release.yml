@@ -1,0 +1,133 @@
+name: Release All
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v1.2.6)'
+        required: true
+      releaseName:
+        description: 'Release title (defaults to tag)'
+        required: false
+      frameworks:
+        description: 'Optional TFM filter (comma/space separated), e.g. "netstandard2.0, net9.0"'
+        required: false
+      attachNupkg:
+        description: 'Attach .nupkg/.snupkg to the Release (no push to registries)'
+        type: boolean
+        required: true
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release-all:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET SDKs (6/7/8/9/10)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.sln*', '**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore solution
+        run: dotnet restore OutWit.slnx
+
+      - name: Build solution (all TFM)
+        run: dotnet build OutWit.slnx -c Release -p:ContinuousIntegrationBuild=true --no-restore
+
+      - name: Pack solution (no build)
+        run: dotnet pack OutWit.slnx -c Release --no-build
+
+      - name: Collect all packages
+        shell: pwsh
+        run: |
+          if (!(Test-Path "NuGet")) { New-Item -ItemType Directory -Force -Path "NuGet" | Out-Null }
+          Get-ChildItem -Recurse -Include *.nupkg,*.snupkg -Path . |
+            Where-Object { $_.FullName -match "\\bin\\Release\\" } |
+            Copy-Item -Destination "NuGet" -Force
+          Write-Host "Collected packages:"; Get-ChildItem NuGet | Select-Object Name
+
+      - name: Gather per-project & per-TFM build outputs
+        id: gather
+        shell: pwsh
+        run: |
+          $solutionRoot = (Get-Location).Path
+          $outRoot = "out/release"
+          if (Test-Path $outRoot) { Remove-Item -Recurse -Force $outRoot }
+          
+          $projects = Get-ChildItem -Recurse -Filter *.csproj |
+            Where-Object { $_.Name -notmatch '\.Tests\.csproj$' } |
+            Sort-Object FullName
+
+          $tfmFilter = "${{ github.event.inputs.frameworks }}"
+          $wanted = @()
+          if ($tfmFilter) { $wanted = $tfmFilter -split '[,;\s]+' | Where-Object { $_ } }
+
+          $copied = 0
+          foreach ($proj in $projects) {
+            $projDir = Split-Path $proj.FullName -Parent
+            $projName = [System.IO.Path]::GetFileNameWithoutExtension($proj.Name)
+            $releaseDir = Join-Path $projDir "bin/Release"
+            if (-not (Test-Path $releaseDir)) { continue }
+            
+            $tfms = Get-ChildItem -Path $releaseDir -Directory -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -match '^net(standard)?\d+(\.\d+)?$' } |
+              Select-Object -ExpandProperty Name
+
+            if ($wanted.Count -gt 0) {
+              $tfms = $tfms | Where-Object { $wanted -contains $_ }
+            }
+
+            foreach ($tfm in $tfms) {
+              $src = Join-Path $releaseDir $tfm
+              if (-not (Test-Path $src)) { continue }
+              $dst = Join-Path $outRoot $projName $tfm
+              New-Item -ItemType Directory -Force -Path $dst | Out-Null
+              Copy-Item -Recurse -Force -Path (Join-Path $src '*') -Destination $dst
+              $copied++
+              Write-Host "Copied $projName / $tfm"
+            }
+          }
+
+          if ($copied -eq 0) { Write-Error "No build outputs found in bin/Release for any project/TFM."; exit 1 }
+          "copied=$copied" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
+
+      - name: Create one zip with all projects/TFM
+        id: zipit
+        shell: pwsh
+        run: |
+          $tag = "${{ github.event.inputs.tag }}"
+          $zip = "OutWit.Common-$tag.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path (Join-Path "out/release" '*') -DestinationPath $zip -Force
+          "zip=$zip" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
+          Write-Host "Created $zip"
+
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.releaseName || github.event.inputs.tag }}
+          draft: false
+          prerelease: false
+          files: |
+            ${{ steps.zipit.outputs.zip }}
+            ${{ github.event.inputs.attachNupkg == 'true' && 'NuGet/*.nupkg' || '' }}
+            ${{ github.event.inputs.attachNupkg == 'true' && 'NuGet/*.snupkg' || '' }}

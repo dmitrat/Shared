@@ -1,0 +1,131 @@
+name: Pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Project to pack (name equals .csproj filename without extension)'
+        required: true
+        type: choice
+        options:
+          - OutWit.Common
+          - OutWit.Common.Aspects
+          - OutWit.Common.CommandLine
+          - OutWit.Common.Logging
+          - OutWit.Common.Logging.Abstractions
+          - OutWit.Common.Rest
+          - OutWit.Common.Reflection
+          - OutWit.Common.Proxy
+          - OutWit.Common.Proxy.Generator
+          - OutWit.Common.Json
+          - OutWit.Common.MemoryPack
+          - OutWit.Common.MessagePack
+          - OutWit.Common.ProtoBuf
+          - OutWit.Common.MVVM
+          - OutWit.Common.MVVM.WPF
+          - OutWit.Common.MVVM.WPF.Generator
+          - OutWit.Common.MVVM.Avalonia
+          - OutWit.Common.MVVM.Avalonia.Generator
+          - OutWit.Common.MVVM.Blazor
+          - OutWit.Common.NUnit
+          - OutWit.Common.Plugins
+          - OutWit.Common.Plugins.Abstractions
+          - OutWit.Common.Settings
+          - OutWit.Common.Settings.Json
+          - OutWit.Common.Settings.Csv
+          - OutWit.Common.Settings.Database
+          - OutWit.Common.Configuration
+          - OutWit.Common.Email
+          - OutWit.Common.NewRelic
+          - OutWit.Common.Blazor.Logging
+
+permissions:
+  contents: read
+
+jobs:
+  pack:
+    runs-on: windows-latest
+    env:
+      PROJECT: ${{ github.event.inputs.project }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup .NET SDKs (6/7/8/9/10)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            7.0.x
+            8.0.x
+            9.0.x
+            10.0.x
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.slnx', '**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore slnx
+        run: dotnet restore OutWit.slnx
+
+      - name: Resolve project paths
+        id: paths
+        shell: pwsh
+        run: |
+          $projName = '${{ env.PROJECT }}'
+          $lib = Get-ChildItem -Recurse -Filter "$projName.csproj" | Select-Object -Expand FullName -First 1
+          if (!$lib) { Write-Error "Library project $projName.csproj not found"; exit 1 }
+          "libCsproj=$lib" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Resolved: $lib"
+          
+          # Check if this project embeds a generator and needs it built first
+          # Projects that embed generators: OutWit.Common.Proxy, OutWit.Common.MVVM.WPF, OutWit.Common.MVVM.Avalonia
+          $generatorProject = ""
+          switch ($projName) {
+            "OutWit.Common.Proxy" { 
+              $generatorProject = Get-ChildItem -Recurse -Filter "OutWit.Common.Proxy.Generator.csproj" | Select-Object -Expand FullName -First 1
+            }
+            "OutWit.Common.MVVM.WPF" { 
+              $generatorProject = Get-ChildItem -Recurse -Filter "OutWit.Common.MVVM.WPF.Generator.csproj" | Select-Object -Expand FullName -First 1
+            }
+            "OutWit.Common.MVVM.Avalonia" { 
+              $generatorProject = Get-ChildItem -Recurse -Filter "OutWit.Common.MVVM.Avalonia.Generator.csproj" | Select-Object -Expand FullName -First 1
+            }
+          }
+          
+          if ($generatorProject) {
+            "generatorCsproj=$generatorProject" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            "hasGenerator=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "Associated generator: $generatorProject"
+          } else {
+            "hasGenerator=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "No associated generator"
+          }
+
+      - name: Build generator (if needed)
+        if: steps.paths.outputs.hasGenerator == 'true'
+        run: dotnet build "${{ steps.paths.outputs.generatorCsproj }}" --configuration Release
+
+      - name: Build (all target frameworks)
+        run: dotnet build "${{ steps.paths.outputs.libCsproj }}" --configuration Release -p:ContinuousIntegrationBuild=true
+
+      - name: Pack (no build)
+        run: dotnet pack "${{ steps.paths.outputs.libCsproj }}" --configuration Release --no-build
+
+      - name: Collect packages
+        shell: pwsh
+        run: |
+          if (!(Test-Path "NuGet")) { New-Item -ItemType Directory -Force -Path "NuGet" | Out-Null }
+          Get-ChildItem -Recurse -Include *.nupkg,*.snupkg -Path . |
+            Where-Object { $_.FullName -match "\\bin\\Release\\" } |
+            Copy-Item -Destination "NuGet" -Force
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages-${{ env.PROJECT }}
+          path: NuGet/*
+          if-no-files-found: error
