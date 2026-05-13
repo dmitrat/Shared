@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Logging.Provider.File. Copies the plugin module folder from
+    inside the package into the host's output @Logging/file.module/, where the
+    host's WitPluginLoader<ILogProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopyFileLogProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_FileLogPluginFiles Include="$(MSBuildThisFileDirectory)..\logging\file.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_FileLogPluginFiles)"
+          DestinationFolder="$(OutputPath)@Logging\file.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopyFileLogProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_FileLogPluginPubFiles Include="$(MSBuildThisFileDirectory)..\logging\file.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_FileLogPluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Logging\file.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

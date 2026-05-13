@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>OutWit.Shared.Logging.Provider.File</id>
+    <version>$version$</version>
+    <authors>Dmitry Ratner</authors>
+    <description>File-scanning log query plugin for OutWit hosts. The "no external account needed" fallback — reads the host's Serilog NDJSON files in-place and exposes them through a neutral ILogQueryProvider. Drop into the host's @Logging folder and set Logging__ProviderKey=File.</description>
+    <copyright>Copyright © 2026 Dmitry Ratner</copyright>
+    <license type="expression">Apache-2.0</license>
+    <projectUrl>https://github.com/dmitrat/Shared/tree/main/Logging/OutWit.Shared.Logging.Provider.File</projectUrl>
+    <tags>OutWit Shared Logging Provider File Serilog</tags>
+    <readme>README.md</readme>
+    <icon>OutWit-logo.png</icon>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+    <file src="OutWit-logo.png" target="\" />
+    <file src="NOTICE.txt" target="\" />
+    <file src="LICENSE.txt" target="\" />
+    <file src="build\OutWit.Shared.Logging.Provider.File.targets" target="build" />
+    <file src="build\OutWit.Shared.Logging.Provider.File.targets" target="buildTransitive" />
+    <file src="..\..\@Logging\Release\file.module\**\*" target="logging\file.module" />
+    <file src="bin\Release\net10.0\OutWit.Shared.Logging.Provider.File.dll" target="lib\net10.0" />
+  </files>
+</package>

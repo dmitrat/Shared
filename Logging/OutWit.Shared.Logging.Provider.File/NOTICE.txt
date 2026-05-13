@@ -1,0 +1,9 @@
+OutWit.Shared.Logging.Provider.File
+Copyright 2020-2026 Dmitry Ratner
+Project home: https://ratner.io/
+
+OutWit.Shared.Logging.Provider.File is part of the OutWit ecosystem.
+
+This package depends on OutWit.Common.Logging.Query
+(https://github.com/dmitrat/Common) for the neutral log-query types
+and reads Serilog-formatted NDJSON files written by the host.

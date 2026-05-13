@@ -24,5 +24,8 @@
   </Folder>
   <Folder Name="/Logging/">
     <Project Path="Logging/OutWit.Shared.Logging.Blazor/OutWit.Shared.Logging.Blazor.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Provider.File/OutWit.Shared.Logging.Provider.File.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Provider.File.Tests/OutWit.Shared.Logging.Provider.File.Tests.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Providers/OutWit.Shared.Logging.Providers.csproj" />
   </Folder>
 </Solution>

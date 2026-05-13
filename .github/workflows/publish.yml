@@ -14,6 +14,8 @@ on:
           - OutWit.Shared.Email.Provider.Smtp
           - OutWit.Shared.Email.Provider.Resend
           - OutWit.Shared.Logging.Blazor
+          - OutWit.Shared.Logging.Providers
+          - OutWit.Shared.Logging.Provider.File
       pushToNuGet:
         description: 'Push to nuget.org'
         type: boolean
