@@ -1,0 +1,9 @@
+OutWit.Shared.Email.Provider.Smtp
+Copyright 2020-2026 Dmitry Ratner
+Project home: https://ratner.io/
+
+OutWit.Shared.Email.Provider.Smtp is part of the OutWit ecosystem.
+
+This package depends on MailKit (https://github.com/jstedfast/MailKit),
+which is licensed under the MIT License. See its own NOTICE / license for
+attribution requirements.

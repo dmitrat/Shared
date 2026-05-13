@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - OutWit.Shared.Email.Provider.Null
+          - OutWit.Shared.Email.Provider.Smtp
       configuration:
         description: 'Build configuration'
         required: false

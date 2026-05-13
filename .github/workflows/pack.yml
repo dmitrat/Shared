@@ -10,6 +10,7 @@ on:
         options:
           - OutWit.Shared.Email.Providers
           - OutWit.Shared.Email.Provider.Null
+          - OutWit.Shared.Email.Provider.Smtp
 
 permissions:
   contents: read

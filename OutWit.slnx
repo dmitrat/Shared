@@ -16,6 +16,8 @@
   <Folder Name="/Email/">
     <Project Path="Email/OutWit.Shared.Email.Provider.Null.Tests/OutWit.Shared.Email.Provider.Null.Tests.csproj" />
     <Project Path="Email/OutWit.Shared.Email.Provider.Null/OutWit.Shared.Email.Provider.Null.csproj" />
+    <Project Path="Email/OutWit.Shared.Email.Provider.Smtp.Tests/OutWit.Shared.Email.Provider.Smtp.Tests.csproj" />
+    <Project Path="Email/OutWit.Shared.Email.Provider.Smtp/OutWit.Shared.Email.Provider.Smtp.csproj" />
     <Project Path="Email/OutWit.Shared.Email.Providers/OutWit.Shared.Email.Providers.csproj" />
   </Folder>
 </Solution>

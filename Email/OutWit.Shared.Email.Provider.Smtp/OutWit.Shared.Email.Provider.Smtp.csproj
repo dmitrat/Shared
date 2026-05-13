@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>1.0.0</Version>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<!-- Plugin runtime is self-contained: copy NuGet deps next to the plugin DLL so
+			 WitPluginLoader resolves the full closure from the module folder alone. -->
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+		<Description>SMTP email transport plugin for OutWit hosts. Covers on-prem mail relays, corporate Exchange, and local dev SMTP catchers (MailHog, Papercut). Uses MailKit. Set Email__ProviderKey=Smtp and configure Smtp:Host / Smtp:Port / Smtp:Username / Smtp:Password to activate.</Description>
+		<PackageTags>OutWit;Shared;Email;Provider;SMTP;MailKit</PackageTags>
+
+		<!-- Plugin package: explicit nuspec packaging. -->
+		<NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+		<NuspecProperties>version=$(Version)</NuspecProperties>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<IncludeSymbols>false</IncludeSymbols>
+		<PackageReadmeFile></PackageReadmeFile>
+		<PackageIcon></PackageIcon>
+
+		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Provider.Smtp</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OutWit.Common.Plugins.Abstractions" Version="1.1.*" />
+		<PackageReference Include="OutWit.Common.Email" Version="1.0.*" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+		<PackageReference Include="MailKit" Version="4.16.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\OutWit.Shared.Email.Providers\OutWit.Shared.Email.Providers.csproj" />
+	</ItemGroup>
+
+	<!--
+		Stage the plugin into <solution>/@Email/<Config>/smtp.module/ after build.
+	-->
+	<Target Name="CopyPluginToOutputDirectory"
+			AfterTargets="Build"
+			Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">
+		<ItemGroup>
+			<PluginFiles Include="$(TargetDir)*.dll" />
+			<PluginFiles Include="$(TargetDir)$(TargetName).deps.json"
+						 Condition="Exists('$(TargetDir)$(TargetName).deps.json')" />
+			<PluginFiles Include="$(MSBuildThisFileDirectory)appsettings.json"
+						 Condition="Exists('$(MSBuildThisFileDirectory)appsettings.json')" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(PluginFiles)"
+			  DestinationFolder="$(SolutionDir)@Email\$(Configuration)\smtp.module\%(RecursiveDir)"
+			  SkipUnchangedFiles="true"
+			  OverwriteReadOnlyFiles="true" />
+	</Target>
+
+</Project>

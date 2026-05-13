@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Email.Provider.Smtp. Copies the plugin module folder from
+    inside the package into the host's output @Email/smtp.module/, where the
+    host's WitPluginLoader<IEmailProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopySmtpEmailProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_SmtpEmailPluginFiles Include="$(MSBuildThisFileDirectory)..\email\smtp.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_SmtpEmailPluginFiles)"
+          DestinationFolder="$(OutputPath)@Email\smtp.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopySmtpEmailProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_SmtpEmailPluginPubFiles Include="$(MSBuildThisFileDirectory)..\email\smtp.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_SmtpEmailPluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Email\smtp.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

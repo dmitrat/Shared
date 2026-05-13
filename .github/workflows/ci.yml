@@ -33,6 +33,10 @@ jobs:
               - 'Email/OutWit.Shared.Email.Provider.Null/**'
               - 'Email/OutWit.Shared.Email.Provider.Null.Tests/**'
               - 'Email/OutWit.Shared.Email.Providers/**'
+            OutWit.Shared.Email.Provider.Smtp:
+              - 'Email/OutWit.Shared.Email.Provider.Smtp/**'
+              - 'Email/OutWit.Shared.Email.Provider.Smtp.Tests/**'
+              - 'Email/OutWit.Shared.Email.Providers/**'
 
   run-tests:
     name: Test ${{ matrix.project }}
