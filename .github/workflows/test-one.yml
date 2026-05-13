@@ -12,6 +12,8 @@ on:
           - OutWit.Shared.Email.Provider.Smtp
           - OutWit.Shared.Email.Provider.Resend
           - OutWit.Shared.Logging.Provider.File
+          - OutWit.Shared.Logging.Provider.NewRelic
+          - OutWit.Shared.Logging.Provider.Loki
       configuration:
         description: 'Build configuration'
         required: false

@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Logging.Provider.NewRelic. Copies the plugin module folder
+    from inside the package into the host's output @Logging/newrelic.module/,
+    where the host's WitPluginLoader<ILogProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopyNewRelicLogProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_NewRelicLogPluginFiles Include="$(MSBuildThisFileDirectory)..\logging\newrelic.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_NewRelicLogPluginFiles)"
+          DestinationFolder="$(OutputPath)@Logging\newrelic.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopyNewRelicLogProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_NewRelicLogPluginPubFiles Include="$(MSBuildThisFileDirectory)..\logging\newrelic.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_NewRelicLogPluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Logging\newrelic.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

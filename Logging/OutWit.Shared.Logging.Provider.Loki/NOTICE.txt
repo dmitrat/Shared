@@ -1,0 +1,9 @@
+OutWit.Shared.Logging.Provider.Loki
+Copyright 2020-2026 Dmitry Ratner
+Project home: https://ratner.io/
+
+OutWit.Shared.Logging.Provider.Loki is part of the OutWit ecosystem.
+
+This package depends on OutWit.Common.Logging.Loki
+(https://github.com/dmitrat/Common), which wraps the Grafana Loki
+/loki/api/v1/* HTTP endpoints. Loki is a trademark of Grafana Labs.

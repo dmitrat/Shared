@@ -49,6 +49,14 @@ jobs:
               - 'Logging/OutWit.Shared.Logging.Provider.File/**'
               - 'Logging/OutWit.Shared.Logging.Provider.File.Tests/**'
               - 'Logging/OutWit.Shared.Logging.Providers/**'
+            OutWit.Shared.Logging.Provider.NewRelic:
+              - 'Logging/OutWit.Shared.Logging.Provider.NewRelic/**'
+              - 'Logging/OutWit.Shared.Logging.Provider.NewRelic.Tests/**'
+              - 'Logging/OutWit.Shared.Logging.Providers/**'
+            OutWit.Shared.Logging.Provider.Loki:
+              - 'Logging/OutWit.Shared.Logging.Provider.Loki/**'
+              - 'Logging/OutWit.Shared.Logging.Provider.Loki.Tests/**'
+              - 'Logging/OutWit.Shared.Logging.Providers/**'
 
   run-tests:
     name: Test ${{ matrix.project }}

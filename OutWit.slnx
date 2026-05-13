@@ -26,6 +26,10 @@
     <Project Path="Logging/OutWit.Shared.Logging.Blazor/OutWit.Shared.Logging.Blazor.csproj" />
     <Project Path="Logging/OutWit.Shared.Logging.Provider.File/OutWit.Shared.Logging.Provider.File.csproj" />
     <Project Path="Logging/OutWit.Shared.Logging.Provider.File.Tests/OutWit.Shared.Logging.Provider.File.Tests.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Provider.Loki/OutWit.Shared.Logging.Provider.Loki.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Provider.Loki.Tests/OutWit.Shared.Logging.Provider.Loki.Tests.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Provider.NewRelic/OutWit.Shared.Logging.Provider.NewRelic.csproj" />
+    <Project Path="Logging/OutWit.Shared.Logging.Provider.NewRelic.Tests/OutWit.Shared.Logging.Provider.NewRelic.Tests.csproj" />
     <Project Path="Logging/OutWit.Shared.Logging.Providers/OutWit.Shared.Logging.Providers.csproj" />
   </Folder>
 </Solution>

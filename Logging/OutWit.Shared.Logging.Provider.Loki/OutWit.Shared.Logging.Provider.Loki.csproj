@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Version>1.0.0</Version>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+		<Description>Grafana Loki log provider plugin for OutWit hosts. Thin wrapper over OutWit.Common.Logging.Loki — registers an ILogQueryProvider that translates neutral LogQuery requests into LogQL and dispatches them against /loki/api/v1/*. Drop into the host's @Logging folder and set Logging__ProviderKey=Loki.</Description>
+		<PackageTags>OutWit;Shared;Logging;Provider;Loki;Grafana;LogQL</PackageTags>
+
+		<NuspecFile>$(MSBuildProjectName).nuspec</NuspecFile>
+		<NuspecProperties>version=$(Version)</NuspecProperties>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<IncludeSymbols>false</IncludeSymbols>
+		<PackageReadmeFile></PackageReadmeFile>
+		<PackageIcon></PackageIcon>
+
+		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Logging/OutWit.Shared.Logging.Provider.Loki</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OutWit.Common.Plugins.Abstractions" Version="1.1.*" />
+		<PackageReference Include="OutWit.Common.Logging.Query" Version="1.0.*" />
+		<PackageReference Include="OutWit.Common.Logging.Loki" Version="1.0.*" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\OutWit.Shared.Logging.Providers\OutWit.Shared.Logging.Providers.csproj" />
+	</ItemGroup>
+
+	<Target Name="CopyPluginToOutputDirectory"
+			AfterTargets="Build"
+			Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">
+		<ItemGroup>
+			<PluginFiles Include="$(TargetDir)*.dll" />
+			<PluginFiles Include="$(TargetDir)$(TargetName).deps.json"
+						 Condition="Exists('$(TargetDir)$(TargetName).deps.json')" />
+			<PluginFiles Include="$(MSBuildThisFileDirectory)appsettings.json"
+						 Condition="Exists('$(MSBuildThisFileDirectory)appsettings.json')" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(PluginFiles)"
+			  DestinationFolder="$(SolutionDir)@Logging\$(Configuration)\loki.module\%(RecursiveDir)"
+			  SkipUnchangedFiles="true"
+			  OverwriteReadOnlyFiles="true" />
+	</Target>
+
+</Project>
