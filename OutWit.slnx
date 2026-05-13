@@ -22,4 +22,7 @@
     <Project Path="Email/OutWit.Shared.Email.Provider.Smtp/OutWit.Shared.Email.Provider.Smtp.csproj" />
     <Project Path="Email/OutWit.Shared.Email.Providers/OutWit.Shared.Email.Providers.csproj" />
   </Folder>
+  <Folder Name="/Logging/">
+    <Project Path="Logging/OutWit.Shared.Logging.Blazor/OutWit.Shared.Logging.Blazor.csproj" />
+  </Folder>
 </Solution>

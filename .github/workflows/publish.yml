@@ -13,6 +13,7 @@ on:
           - OutWit.Shared.Email.Provider.Null
           - OutWit.Shared.Email.Provider.Smtp
           - OutWit.Shared.Email.Provider.Resend
+          - OutWit.Shared.Logging.Blazor
       pushToNuGet:
         description: 'Push to nuget.org'
         type: boolean

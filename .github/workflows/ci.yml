@@ -41,6 +41,8 @@ jobs:
               - 'Email/OutWit.Shared.Email.Provider.Resend/**'
               - 'Email/OutWit.Shared.Email.Provider.Resend.Tests/**'
               - 'Email/OutWit.Shared.Email.Providers/**'
+            OutWit.Shared.Logging.Blazor:
+              - 'Logging/OutWit.Shared.Logging.Blazor/**'
 
   run-tests:
     name: Test ${{ matrix.project }}
