@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Email.Provider.Resend. Copies the plugin module folder from
+    inside the package into the host's output @Email/resend.module/, where the
+    host's WitPluginLoader<IEmailProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopyResendEmailProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_ResendEmailPluginFiles Include="$(MSBuildThisFileDirectory)..\email\resend.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_ResendEmailPluginFiles)"
+          DestinationFolder="$(OutputPath)@Email\resend.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopyResendEmailProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_ResendEmailPluginPubFiles Include="$(MSBuildThisFileDirectory)..\email\resend.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_ResendEmailPluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Email\resend.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

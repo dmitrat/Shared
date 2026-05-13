@@ -12,6 +12,7 @@ on:
           - OutWit.Shared.Email.Providers
           - OutWit.Shared.Email.Provider.Null
           - OutWit.Shared.Email.Provider.Smtp
+          - OutWit.Shared.Email.Provider.Resend
       pushToNuGet:
         description: 'Push to nuget.org'
         type: boolean

@@ -10,6 +10,7 @@ on:
         options:
           - OutWit.Shared.Email.Provider.Null
           - OutWit.Shared.Email.Provider.Smtp
+          - OutWit.Shared.Email.Provider.Resend
       configuration:
         description: 'Build configuration'
         required: false

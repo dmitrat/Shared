@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>OutWit.Shared.Email.Provider.Resend</id>
+    <version>$version$</version>
+    <authors>Dmitry Ratner</authors>
+    <description>Resend email transport plugin for OutWit hosts. HTTP-API based (api.resend.com) — modern transactional email service used in production at WitIdentity. Drop into the host's @Email folder and set Email__ProviderKey=Resend.</description>
+    <copyright>Copyright © 2026 Dmitry Ratner</copyright>
+    <license type="expression">Apache-2.0</license>
+    <projectUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Provider.Resend</projectUrl>
+    <tags>OutWit Shared Email Provider Resend</tags>
+    <readme>README.md</readme>
+    <icon>OutWit-logo.png</icon>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+    <file src="OutWit-logo.png" target="\" />
+    <file src="NOTICE.txt" target="\" />
+    <file src="LICENSE.txt" target="\" />
+    <file src="build\OutWit.Shared.Email.Provider.Resend.targets" target="build" />
+    <file src="build\OutWit.Shared.Email.Provider.Resend.targets" target="buildTransitive" />
+    <file src="..\..\@Email\Release\resend.module\**\*" target="email\resend.module" />
+    <file src="bin\Release\net10.0\OutWit.Shared.Email.Provider.Resend.dll" target="lib\net10.0" />
+  </files>
+</package>
