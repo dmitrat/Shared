@@ -1,0 +1,5 @@
+OutWit.Shared.Email.Plugin.Null
+Copyright 2020-2026 Dmitry Ratner
+Project home: https://ratner.io/
+
+OutWit.Shared.Email.Plugin.Null is part of the OutWit ecosystem.

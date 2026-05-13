@@ -27,100 +27,12 @@ jobs:
         with:
           list-files: json
           filters: |
-            OutWit.Common:
-              - 'Common/**'
-            OutWit.Common.Aspects:
-              - 'Aspects/**'
-              - 'Common/**'
-            OutWit.Common.CommandLine:
-              - 'CommandLine/**'
-            OutWit.Common.Logging:
-              - 'Logging/OutWit.Common.Logging/**'
-              - 'Logging/OutWit.Common.Logging.Tests/**'
-              - 'Logging/OutWit.Common.Logging.Abstractions/**'
-              - 'Aspects/**'
-            OutWit.Common.Logging.Abstractions:
-              - 'Logging/OutWit.Common.Logging.Abstractions/**'
-            OutWit.Common.Rest:
-              - 'Rest/**'
-              - 'Common/**'
-            OutWit.Common.Reflection:
-              - 'Reflection/**'
-            OutWit.Common.Proxy:
-              - 'Proxy/OutWit.Common.Proxy/**'
-              - 'Proxy/OutWit.Common.Proxy.Tests/**'
-              - 'Common/**'
-            OutWit.Common.Proxy.Generator:
-              - 'Proxy/OutWit.Common.Proxy.Generator/**'
-              - 'Proxy/OutWit.Common.Proxy.Generator.Tests/**'
-              - 'Proxy/OutWit.Common.Proxy/**'
-            OutWit.Common.Json:
-              - 'Serialization/Json/**'
-              - 'Aspects/**'
-            OutWit.Common.MemoryPack:
-              - 'Serialization/MemoryPack/**'
-              - 'Aspects/**'
-            OutWit.Common.MessagePack:
-              - 'Serialization/MessagePack/**'
-              - 'Aspects/**'
-            OutWit.Common.ProtoBuf:
-              - 'Serialization/ProtoBuf/**'
-              - 'Aspects/**'
-            OutWit.Common.MVVM:
-              - 'MVVM/OutWit.Common.MVVM/**'
-              - 'MVVM/OutWit.Common.MVVM.Tests/**'
-            OutWit.Common.MVVM.WPF:
-              - 'MVVM/OutWit.Common.MVVM.WPF/**'
-              - 'MVVM/OutWit.Common.MVVM.WPF.Tests/**'
-              - 'MVVM/OutWit.Common.MVVM.WPF.Generator/**'
-              - 'MVVM/OutWit.Common.MVVM/**'
-            OutWit.Common.MVVM.WPF.Generator:
-              - 'MVVM/OutWit.Common.MVVM.WPF.Generator/**'
-            OutWit.Common.MVVM.Avalonia:
-              - 'MVVM/OutWit.Common.MVVM.Avalonia/**'
-              - 'MVVM/OutWit.Common.MVVM.Avalonia.Tests/**'
-              - 'MVVM/OutWit.Common.MVVM.Avalonia.Generator/**'
-              - 'MVVM/OutWit.Common.MVVM/**'
-            OutWit.Common.MVVM.Avalonia.Generator:
-              - 'MVVM/OutWit.Common.MVVM.Avalonia.Generator/**'
-            OutWit.Common.MVVM.Blazor:
-              - 'MVVM/OutWit.Common.MVVM.Blazor/**'
-              - 'MVVM/OutWit.Common.MVVM.Blazor.Tests/**'
-              - 'MVVM/OutWit.Common.MVVM/**'
-            OutWit.Common.NUnit:
-              - 'NUnit/OutWit.Common.NUnit/**'
-            OutWit.Common.Plugins:
-              - 'Plugins/OutWit.Common.Plugins/**'
-              - 'Plugins/OutWit.Common.Plugins.Tests/**'
-              - 'Plugins/OutWit.Common.Plugins.Tests.Mock.*/**'
-              - 'Plugins/OutWit.Common.Plugins.Abstractions/**'
-            OutWit.Common.Settings:
-              - 'Settings/OutWit.Common.Settings/**'
-              - 'Settings/OutWit.Common.Settings.Tests/**'
-            OutWit.Common.Settings.Json:
-              - 'Settings/Json/OutWit.Common.Settings.Json/**'
-              - 'Settings/Json/OutWit.Common.Settings.Json.Tests/**'
-              - 'Settings/OutWit.Common.Settings/**'
-            OutWit.Common.Settings.Csv:
-              - 'Settings/Csv/OutWit.Common.Settings.Csv/**'
-              - 'Settings/Csv/OutWit.Common.Settings.Csv.Tests/**'
-              - 'Settings/OutWit.Common.Settings/**'
-            OutWit.Common.Settings.Database:
-              - 'Settings/Database/OutWit.Common.Settings.Database/**'
-              - 'Settings/Database/OutWit.Common.Settings.Database.Tests/**'
-              - 'Settings/OutWit.Common.Settings/**'
-            OutWit.Common.Configuration:
-              - 'Configuration/**'
-            OutWit.Common.Email:
-              - 'Email/**'
-            OutWit.Common.NewRelic:
-              - 'NewRelic/**'
-              - 'Rest/**'
-              - 'Serialization/MemoryPack/**'
-            OutWit.Common.Blazor.Logging:
-              - 'Blazor/OutWit.Common.Blazor.Logging/**'
-              - 'NewRelic/**'
-              - 'MVVM/OutWit.Common.MVVM.Blazor/**'
+            OutWit.Shared.Email.Plugins:
+              - 'Email/OutWit.Shared.Email.Plugins/**'
+            OutWit.Shared.Email.Plugin.Null:
+              - 'Email/OutWit.Shared.Email.Plugin.Null/**'
+              - 'Email/OutWit.Shared.Email.Plugin.Null.Tests/**'
+              - 'Email/OutWit.Shared.Email.Plugins/**'
 
   run-tests:
     name: Test ${{ matrix.project }}

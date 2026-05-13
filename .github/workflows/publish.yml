@@ -9,36 +9,8 @@ on:
         required: true
         type: choice
         options:
-          - OutWit.Common
-          - OutWit.Common.Aspects
-          - OutWit.Common.CommandLine
-          - OutWit.Common.Logging
-          - OutWit.Common.Logging.Abstractions
-          - OutWit.Common.Rest
-          - OutWit.Common.Reflection
-          - OutWit.Common.Proxy
-          - OutWit.Common.Proxy.Generator
-          - OutWit.Common.Json
-          - OutWit.Common.MemoryPack
-          - OutWit.Common.MessagePack
-          - OutWit.Common.ProtoBuf
-          - OutWit.Common.MVVM
-          - OutWit.Common.MVVM.WPF
-          - OutWit.Common.MVVM.WPF.Generator
-          - OutWit.Common.MVVM.Avalonia
-          - OutWit.Common.MVVM.Avalonia.Generator
-          - OutWit.Common.MVVM.Blazor
-          - OutWit.Common.NUnit
-          - OutWit.Common.Plugins
-          - OutWit.Common.Plugins.Abstractions
-          - OutWit.Common.Settings
-          - OutWit.Common.Settings.Json
-          - OutWit.Common.Settings.Csv
-          - OutWit.Common.Settings.Database
-          - OutWit.Common.Configuration
-          - OutWit.Common.Email
-          - OutWit.Common.NewRelic
-          - OutWit.Common.Blazor.Logging
+          - OutWit.Shared.Email.Plugins
+          - OutWit.Shared.Email.Plugin.Null
       pushToNuGet:
         description: 'Push to nuget.org'
         type: boolean
@@ -81,45 +53,22 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
-      - name: Resolve project paths
+      - name: Resolve project path
         id: paths
         shell: pwsh
         run: |
           $name = "${{ env.PROJECT }}"
           $lib = Get-ChildItem -Recurse -Filter "$name.csproj" | Select-Object -Expand FullName -First 1
-          if (-not $lib) { Write-Error "Library project '$name.csproj' not found"; exit 1 }
+          if (-not $lib) { Write-Error "Project '$name.csproj' not found"; exit 1 }
           "libCsproj=$lib" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           Write-Host "Resolved: $lib"
-          
-          # Check if this project embeds a generator and needs it built first
-          # Projects that embed generators: OutWit.Common.Proxy, OutWit.Common.MVVM.WPF, OutWit.Common.MVVM.Avalonia
-          $generatorProject = ""
-          switch ($name) {
-            "OutWit.Common.Proxy" { 
-              $generatorProject = Get-ChildItem -Recurse -Filter "OutWit.Common.Proxy.Generator.csproj" | Select-Object -Expand FullName -First 1
-            }
-            "OutWit.Common.MVVM.WPF" { 
-              $generatorProject = Get-ChildItem -Recurse -Filter "OutWit.Common.MVVM.WPF.Generator.csproj" | Select-Object -Expand FullName -First 1
-            }
-            "OutWit.Common.MVVM.Avalonia" { 
-              $generatorProject = Get-ChildItem -Recurse -Filter "OutWit.Common.MVVM.Avalonia.Generator.csproj" | Select-Object -Expand FullName -First 1
-            }
-          }
-          
-          if ($generatorProject) {
-            "generatorCsproj=$generatorProject" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            "hasGenerator=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            Write-Host "Associated generator: $generatorProject"
-          } else {
-            "hasGenerator=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-            Write-Host "No associated generator"
-          }
 
-      - name: Build generator (if needed)
-        if: steps.paths.outputs.hasGenerator == 'true'
-        run: dotnet build "${{ steps.paths.outputs.generatorCsproj }}" -c Release
-
-      - name: Build (all target frameworks)
+      # Plugin packages (csproj with NuspecFile) embed a staging step that copies
+      # the plugin module into @Plugins/<Config>/<key>.module/ during build.
+      # Directory.Build.props supplies a SolutionDir fallback so single-csproj
+      # builds also fire that target — the package's nuspec then finds the staged
+      # files at pack time.
+      - name: Build (Release)
         run: dotnet build "${{ steps.paths.outputs.libCsproj }}" -c Release -p:ContinuousIntegrationBuild=true
 
       - name: Pack (no build)
@@ -133,13 +82,13 @@ jobs:
           Get-ChildItem -Recurse -Include *.nupkg,*.snupkg -Path . |
             Where-Object { $_.FullName -match "\\bin\\Release\\" } |
             Copy-Item -Destination "NuGet" -Force
-          
+
           $hasNupkg = (Get-ChildItem -Path "NuGet" -Filter "*.nupkg" | Measure-Object).Count -gt 0
           $hasSnupkg = (Get-ChildItem -Path "NuGet" -Filter "*.snupkg" | Measure-Object).Count -gt 0
-          
+
           "hasNupkg=$hasNupkg" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "hasSnupkg=$hasSnupkg" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          
+
           Write-Host "Collected packages:"
           Get-ChildItem NuGet | Select-Object Name
           Write-Host "Has .nupkg: $hasNupkg"
@@ -178,7 +127,7 @@ jobs:
           --api-key ${{ secrets.GITHUB_TOKEN }}
           --source github
           --skip-duplicate
-          
+
       - name: Upload NuGet artifacts
         uses: actions/upload-artifact@v4
         with:

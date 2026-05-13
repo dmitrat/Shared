@@ -1,4 +1,12 @@
 <Project>
+
+  <!-- When MSBuild can't infer SolutionDir (e.g. `dotnet build foo.csproj` outside
+       a solution, or CI pipelines building a single csproj), fall back to the
+       repo root so plugin-staging targets that depend on $(SolutionDir) still fire. -->
+  <PropertyGroup Condition="'$(SolutionDir)' == '' Or '$(SolutionDir)' == '*Undefined*'">
+    <SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(IsTestProject)' != 'true' AND '$(IsPackable)' != 'false'">
 
 	<PackageId>$(MSBuildProjectName)</PackageId>
@@ -31,12 +39,13 @@
 
   </PropertyGroup>
 
-	<ItemGroup Condition="'$(IsTestProject)' != 'true' AND '$(IsPackable)' != 'false'">
-		<None Include="LICENSE" Pack="true" PackagePath="\" />
-		<None Include="OutWit-logo.png" Pack="true" PackagePath="\" />
-		<None Include="README.md" Pack="true" PackagePath="\" />
-		<None Include="NOTICE" Pack="true" PackagePath="\" />
-	</ItemGroup>
+	<!--
+		Metadata files (LICENSE / NOTICE / README.md / OutWit-logo.png) are packed
+		per-project. SDK-Pack projects add four <None Pack> items in their csproj;
+		plugin projects (with <NuspecFile>) list them in the nuspec's <files>.
+		Auto-pack at props level conflicts with nuspec's <files> (NU5050) — making
+		packing explicit per project keeps both paths clean.
+	-->
 
 	<!--<ItemGroup Condition="'$(IsTestProject)' != 'true'">
 		<NuGetFiles Include="$(TargetDir)*$(TargetName)*.nupkg" />

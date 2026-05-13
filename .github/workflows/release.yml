@@ -114,7 +114,7 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.event.inputs.tag }}"
-          $zip = "OutWit.Common-$tag.zip"
+          $zip = "OutWit.Shared-$tag.zip"
           if (Test-Path $zip) { Remove-Item $zip -Force }
           Compress-Archive -Path (Join-Path "out/release" '*') -DestinationPath $zip -Force
           "zip=$zip" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
