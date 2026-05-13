@@ -39,14 +39,14 @@ dotnet add package OutWit.Shared.Email.Provider.Null
 
 ```csharp
 var loader = new WitPluginLoader<IEmailProviderPlugin>(
-    Path.Combine(AppContext.BaseDirectory, "@Plugins"));
+    Path.Combine(AppContext.BaseDirectory, "@Email"));
 loader.Load();
 
 foreach (var plugin in loader.Plugins)
     plugin.Initialize(services);
 ```
 
-The plugin's package brings a `build/.targets` file that auto-copies `null.module/` into your output at build/publish time. The loader picks it up at runtime.
+The plugin's package brings a `build/.targets` file that auto-copies `null.module/` into your output `@Email/` folder at build/publish time. The loader picks it up at runtime. Each plugin category (`@Email/`, `@Logging/`, `@Database/`) gets its own root so different loaders don't interfere.
 
 ## License
 

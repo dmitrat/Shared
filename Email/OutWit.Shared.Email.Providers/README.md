@@ -32,7 +32,7 @@ using OutWit.Common.Plugins;
 using OutWit.Shared.Email.Providers;
 
 var loader = new WitPluginLoader<IEmailProviderPlugin>(
-    Path.Combine(AppContext.BaseDirectory, "@Plugins"));
+    Path.Combine(AppContext.BaseDirectory, "@Email"));
 loader.Load();
 
 foreach (var plugin in loader.Plugins)

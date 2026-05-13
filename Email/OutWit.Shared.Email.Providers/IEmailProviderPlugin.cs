@@ -11,7 +11,7 @@ namespace OutWit.Shared.Email.Providers
     /// </summary>
     /// <remarks>
     /// The <see cref="Key"/> property distinguishes providers when more than one is
-    /// dropped into the same <c>@Plugins/</c> folder. An operator selects the active
+    /// dropped into the same <c>@Email/</c> folder. An operator selects the active
     /// provider via configuration (e.g. <c>Email:ProviderKey=Resend</c>) — each plugin
     /// inspects this value in its <c>Initialize</c> and only registers its transport
     /// when its <see cref="Key"/> matches.

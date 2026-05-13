@@ -4,7 +4,7 @@
     <id>OutWit.Shared.Email.Provider.Null</id>
     <version>$version$</version>
     <authors>Dmitry Ratner</authors>
-    <description>Zero-config fallback email plugin for OutWit hosts. LogOnly mode prints messages to logs (dev / staging); Drop mode fails fast (production-without-email). Drop into the host's @Plugins folder and set Email__ProviderKey=Null.</description>
+    <description>Zero-config fallback email plugin for OutWit hosts. LogOnly mode prints messages to logs (dev / staging); Drop mode fails fast (production-without-email). Drop into the host's @Email folder and set Email__ProviderKey=Null.</description>
     <copyright>Copyright © 2026 Dmitry Ratner</copyright>
     <license type="expression">Apache-2.0</license>
     <projectUrl>https://github.com/dmitrat/Shared/tree/main/Email/OutWit.Shared.Email.Provider.Null</projectUrl>
@@ -19,7 +19,7 @@
     <file src="LICENSE.txt" target="\" />
     <file src="build\OutWit.Shared.Email.Provider.Null.targets" target="build" />
     <file src="build\OutWit.Shared.Email.Provider.Null.targets" target="buildTransitive" />
-    <file src="..\..\@Plugins\Release\null.module\**\*" target="plugins\null.module" />
+    <file src="..\..\@Email\Release\null.module\**\*" target="email\null.module" />
     <file src="bin\Release\net10.0\OutWit.Shared.Email.Provider.Null.dll" target="lib\net10.0" />
   </files>
 </package>

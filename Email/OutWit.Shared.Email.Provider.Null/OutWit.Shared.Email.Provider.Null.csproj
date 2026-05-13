@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -46,8 +46,9 @@
 
 
 	<!--
-		Stage the plugin into <solution>/@Plugins/<Config>/null.module/ after build.
-		Skip when there's no solution context (i.e. during dotnet pack from outside a solution).
+		Stage the plugin into <solution>/@Email/<Config>/null.module/ after build.
+		Each plugin category (Email, Logging, Database) gets its own root folder so
+		hosts can target a single category from a clean directory.
 	-->
 	<Target Name="CopyPluginToOutputDirectory"
 			AfterTargets="Build"
@@ -61,7 +62,7 @@
 		</ItemGroup>
 
 		<Copy SourceFiles="@(PluginFiles)"
-			  DestinationFolder="$(SolutionDir)@Plugins\$(Configuration)\null.module\%(RecursiveDir)"
+			  DestinationFolder="$(SolutionDir)@Email\$(Configuration)\null.module\%(RecursiveDir)"
 			  SkipUnchangedFiles="true"
 			  OverwriteReadOnlyFiles="true" />
 	</Target>

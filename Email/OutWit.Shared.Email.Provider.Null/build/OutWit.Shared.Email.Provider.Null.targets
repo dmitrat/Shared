@@ -3,24 +3,25 @@
   <!--
     Auto-imported by NuGet when a host adds a PackageReference to
     OutWit.Shared.Email.Provider.Null. Copies the plugin module folder from inside
-    the package into the host's output, where WitPluginLoader scans @Plugins/.
+    the package into the host's output @Email/null.module/, where the host's
+    WitPluginLoader<IEmailProviderPlugin> picks it up.
   -->
 
   <Target Name="_CopyNullEmailProvider" AfterTargets="Build">
     <ItemGroup>
-      <_NullEmailPluginFiles Include="$(MSBuildThisFileDirectory)..\plugins\null.module\**\*" />
+      <_NullEmailPluginFiles Include="$(MSBuildThisFileDirectory)..\email\null.module\**\*" />
     </ItemGroup>
     <Copy SourceFiles="@(_NullEmailPluginFiles)"
-          DestinationFolder="$(OutputPath)@Plugins\null.module\%(RecursiveDir)"
+          DestinationFolder="$(OutputPath)@Email\null.module\%(RecursiveDir)"
           SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="_CopyNullEmailProviderPublish" AfterTargets="Publish">
     <ItemGroup>
-      <_NullEmailPluginPubFiles Include="$(MSBuildThisFileDirectory)..\plugins\null.module\**\*" />
+      <_NullEmailPluginPubFiles Include="$(MSBuildThisFileDirectory)..\email\null.module\**\*" />
     </ItemGroup>
     <Copy SourceFiles="@(_NullEmailPluginPubFiles)"
-          DestinationFolder="$(PublishDir)@Plugins\null.module\%(RecursiveDir)"
+          DestinationFolder="$(PublishDir)@Email\null.module\%(RecursiveDir)"
           SkipUnchangedFiles="true" />
   </Target>
 
