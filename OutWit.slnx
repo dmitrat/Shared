@@ -13,6 +13,9 @@
     <File Path=".github/workflows/release.yml" />
     <File Path=".github/workflows/test-one.yml" />
   </Folder>
+  <Folder Name="/Blazor/">
+    <Project Path="Blazor/OutWit.Shared.Blazor.Shell/OutWit.Shared.Blazor.Shell.csproj" />
+  </Folder>
   <Folder Name="/Email/">
     <Project Path="Email/OutWit.Shared.Email.Provider.Null.Tests/OutWit.Shared.Email.Provider.Null.Tests.csproj" />
     <Project Path="Email/OutWit.Shared.Email.Provider.Null/OutWit.Shared.Email.Provider.Null.csproj" />

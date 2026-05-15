@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+
+		<Version>1.0.0</Version>
+
+		<Description>Generic Blazor WebAssembly admin shell built on MudBlazor and Material 3: AppShellLayout (drawer + appbar + theme-toggle), default light/dark theme, simple helpers. No product-specific dependencies — drop into any MudBlazor WASM app, pass Title/Header/LogoUrl as parameters, fill HeaderEnd / Footer slots for product-specific bits.</Description>
+		<PackageTags>OutWit;Shared;Blazor;Shell;MudBlazor;Material3;M3;Layout;WASM</PackageTags>
+
+		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Blazor/OutWit.Shared.Blazor.Shell</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<SupportedPlatform Include="browser" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.8" />
+		<PackageReference Include="MudBlazor" Version="9.4.0" />
+		<PackageReference Include="MudBlazor.FontIcons.MaterialSymbols" Version="1.4.0" />
+		<PackageReference Include="OutWit.Common.MVVM.Blazor" Version="2.0.*" />
+	</ItemGroup>
+
+	<!-- NuGet metadata files. Auto-pack is disabled in Directory.Build.props to avoid
+	     NU5050 conflicts with plugin .nuspec siblings; SDK-Pack projects opt in here. -->
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="NOTICE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="OutWit-logo.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>

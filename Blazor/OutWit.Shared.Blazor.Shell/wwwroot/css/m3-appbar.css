@@ -1,0 +1,68 @@
+/* OutWit.Common.Blazor.Theme - Material 3 AppBar Styles */
+
+/* AppBar container */
+.m3-appbar {
+    background: var(--mud-palette-appbar-background);
+    color: var(--mud-palette-appbar-text);
+    box-shadow: 0 1px 0 var(--mud-palette-divider) inset;
+}
+
+.m3-appbar .mud-icon-button,
+.m3-appbar .mud-icon-root {
+    color: var(--mud-palette-appbar-text) !important;
+    opacity: .92;
+}
+
+.m3-appbar .mud-icon-button:hover {
+    background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.m3-appbar.elevated {
+    box-shadow: 0 2px 12px rgba(0,0,0,.35),
+                0 1px 0 var(--mud-palette-divider) inset;
+}
+
+/* Vertical divider in AppBar */
+.appbar-divider {
+    width: 1px;
+    height: 28px;
+    margin: 0 10px;
+    background: color-mix(in srgb, var(--mud-palette-appbar-text) 18%, transparent);
+    border-radius: 1px;
+}
+
+/* Brand title */
+.brand-title {
+    color: var(--mud-palette-appbar-text);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: .2px;
+    line-height: 1;
+}
+
+/* AppBar alignment with navigation rail */
+.m3-appbar {
+    --rail-mini-width: var(--mud-drawer-width-mini-left, var(--mud-drawer-mini-width, 96px));
+    --rail-hit: 44px;
+    --appbar-btn: 44px;
+    --appbar-left-inset: calc(var(--rail-mini-width) / 2 - var(--appbar-btn) / 2);
+}
+
+.m3-appbar .mud-toolbar {
+    padding-left: var(--appbar-left-inset) !important;
+}
+
+.m3-appbar .mud-icon-button {
+    width: var(--appbar-btn);
+    height: var(--appbar-btn);
+    border-radius: 9999px;
+}
+
+.m3-appbar .mud-icon-button .mud-icon-root {
+    font-size: 24px;
+}
+
+/* When Drawer is not clipped under AppBar */
+.mud-drawer-not-clipped .m3-appbar .mud-toolbar {
+    padding-left: 16px !important;
+}

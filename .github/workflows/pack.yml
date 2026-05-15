@@ -17,6 +17,7 @@ on:
           - OutWit.Shared.Logging.Provider.File
           - OutWit.Shared.Logging.Provider.NewRelic
           - OutWit.Shared.Logging.Provider.Loki
+          - OutWit.Shared.Blazor.Shell
 
 permissions:
   contents: read

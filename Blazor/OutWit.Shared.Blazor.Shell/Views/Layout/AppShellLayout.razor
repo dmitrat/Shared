@@ -1,0 +1,64 @@
+@inherits AppShellLayoutViewModel
+<MudThemeProvider Theme="Theme" IsDarkMode="@IsDark" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged" />
+<MudPopoverProvider />
+
+<HeadContent>
+    <title>@Title</title>
+    <meta name="description" content="@Description" />
+    @if (!string.IsNullOrEmpty(LogoLightUrl))
+    {
+        <link rel="icon" type="image/svg+xml" href="@LogoLightUrl" />
+    }
+</HeadContent>
+
+<MudLayout>
+    <MudAppBar Elevation="0" Class="m3-appbar" Fixed="true">
+        <MudIconButton Icon="@MudBlazor.FontIcons.MaterialSymbols.Outlined.Menu"
+                       Color="Color.Inherit"
+                       OnClick="@(() => ToggleDrawer())" />
+
+        @if (!string.IsNullOrEmpty(LogoDarkUrl))
+        {
+            <MudImage Src="@LogoDarkUrl" Style="height: 26px; margin-left: 5px"></MudImage>
+        }
+        <MudText Typo="Typo.h6" Style="margin-left: 5px">@Header</MudText>
+
+        <MudSpacer />
+
+        <MudIconButton Icon="@MudBlazor.FontIcons.MaterialSymbols.Outlined.LightMode"
+                       OnClick="@(() => ToggleTheme())"
+                       Color="Color.Inherit" />
+
+        @if (HeaderEnd != null)
+        {
+            @HeaderEnd
+        }
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="IsDrawerOpened"
+               Anchor="Anchor.Left"
+               Variant="DrawerVariant.Mini"
+               Elevation="1"
+               MiniWidth="77px"
+               ClipMode="DrawerClipMode.Always"
+               Class="m3-navdrawer">
+        <MudNavMenu Class="m3-nav">
+            @if (NavigationItems != null)
+            {
+                @NavigationItems
+            }
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent>
+        <main class="m3-content">@(ChildContent ?? Body)</main>
+    </MudMainContent>
+</MudLayout>
+
+@if (Footer != null)
+{
+    @Footer
+}

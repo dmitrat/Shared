@@ -1,0 +1,211 @@
+/* OutWit.Common.Blazor.Theme - Material 3 Navigation Styles */
+/* MudNavMenu / MudNavLink styled like Material 3 */
+
+/* Drawer container */
+.m3-navdrawer {
+    background: var(--mud-palette-surface);
+    border-right: 1px solid var(--mud-palette-divider);
+}
+
+.m3-navdrawer .mud-drawer-content {
+    padding: 0 !important;
+}
+
+/* Navigation Rail */
+.m3-rail {
+    width: 84px;
+    padding: 12px 0;
+    background: var(--mud-palette-surface);
+    border-right: 1px solid var(--mud-palette-divider);
+}
+
+.m3-rail .mud-icon-button {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    color: var(--mud-palette-text-secondary);
+}
+
+.m3-rail .mud-icon-button:hover {
+    background: color-mix(in srgb, var(--mud-palette-text-primary) 8%, transparent);
+}
+
+/* Menu container & section headers */
+.m3-nav {
+    padding: 8px 12px;
+}
+
+.m3-nav .mud-list {
+    padding: 0 !important;
+}
+
+.m3-nav .mud-divider {
+    border-color: var(--mud-palette-divider);
+    opacity: .9;
+}
+
+.m3-nav .m3-nav-section {
+    color: var(--mud-palette-text-secondary);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 10px 0 6px 0;
+}
+
+/* Color tokens */
+.m3-nav {
+    --m3-nav-active-fg: var(--mud-palette-primary);
+    --m3-nav-inactive-label: color-mix(in srgb, var(--mud-palette-text-primary) 75%, var(--mud-palette-surface) 25%);
+    --m3-nav-inactive-icon: color-mix(in srgb, var(--mud-palette-text-primary) 85%, var(--mud-palette-surface) 15%);
+    --m3-nav-hover-bg: color-mix(in srgb, var(--mud-palette-primary) 10%, var(--mud-palette-surface) 90%);
+    --m3-nav-active-bg: color-mix(in srgb, var(--mud-palette-primary) 18%, var(--mud-palette-surface) 82%);
+    --m3-nav-active-hover-bg: color-mix(in srgb, var(--mud-palette-primary) 24%, var(--mud-palette-surface) 76%);
+}
+
+/* Dark theme adjustments */
+.mud-theme-dark .m3-nav {
+    --m3-nav-inactive-label: color-mix(in srgb, var(--mud-palette-text-primary) 75%, var(--mud-palette-surface) 25%);
+    --m3-nav-inactive-icon: color-mix(in srgb, var(--mud-palette-text-primary) 85%, var(--mud-palette-surface) 15%);
+}
+
+/* Reset inner wrappers */
+.m3-nav .mud-nav-item,
+.m3-nav .mud-nav-item:hover,
+.m3-nav .mud-nav-item:focus,
+.m3-nav .mud-nav-link-text {
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+.m3-nav a.mud-nav-link * {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Base link styles */
+.m3-nav a.mud-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin: 4px 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    text-decoration: none;
+    color: var(--m3-nav-inactive-label);
+    background: transparent !important;
+    background-color: transparent !important;
+    transition: color .12s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Icon styling */
+.m3-nav a.mud-nav-link .mud-icon-root {
+    color: var(--m3-nav-inactive-icon);
+    font-size: 24px;
+    line-height: 1;
+    transition: color .12s ease;
+    width: 28px;
+    min-width: 28px;
+    text-align: center;
+}
+
+/* Background layer via ::after */
+.m3-nav a.mud-nav-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: transparent;
+    transition: background .18s ease;
+    z-index: 0;
+}
+
+.m3-nav a.mud-nav-link > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Hover for non-active links */
+.m3-nav a.mud-nav-link:not(.active):not(.mud-nav-link-active):hover,
+.m3-nav a.mud-nav-link:not(.active):not(.mud-nav-link-active):focus {
+    color: var(--mud-palette-text-primary) !important;
+}
+
+.m3-nav a.mud-nav-link:not(.active):not(.mud-nav-link-active):hover .mud-icon-root,
+.m3-nav a.mud-nav-link:not(.active):not(.mud-nav-link-active):focus .mud-icon-root {
+    color: var(--mud-palette-text-primary) !important;
+}
+
+.m3-nav a.mud-nav-link:not(.active):not(.mud-nav-link-active):hover::after,
+.m3-nav a.mud-nav-link:not(.active):not(.mud-nav-link-active):focus::after {
+    background: var(--m3-nav-hover-bg);
+}
+
+/* Active link */
+.m3-nav a.mud-nav-link.active,
+.m3-nav a.mud-nav-link.mud-nav-link-active {
+    color: var(--m3-nav-active-fg) !important;
+    font-weight: 700;
+}
+
+.m3-nav a.mud-nav-link.active .mud-icon-root,
+.m3-nav a.mud-nav-link.mud-nav-link-active .mud-icon-root {
+    color: var(--m3-nav-active-fg) !important;
+}
+
+.m3-nav a.mud-nav-link.active::after,
+.m3-nav a.mud-nav-link.mud-nav-link-active::after {
+    background: var(--m3-nav-active-bg);
+}
+
+.m3-nav a.mud-nav-link.active:hover::after,
+.m3-nav a.mud-nav-link.mud-nav-link-active:hover::after {
+    background: var(--m3-nav-active-hover-bg);
+}
+
+.m3-nav a.mud-nav-link.active:hover,
+.m3-nav a.mud-nav-link.mud-nav-link-active:hover {
+    color: var(--m3-nav-active-fg) !important;
+}
+
+/* Keyboard focus ring */
+.m3-nav a.mud-nav-link:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--mud-palette-primary) 40%, transparent);
+    outline-offset: 2px;
+}
+
+/* Mini mode (icons only) */
+.m3-navdrawer.mini .m3-nav-section {
+    display: none;
+}
+
+.m3-navdrawer.mini a.mud-nav-link {
+    justify-content: center;
+    gap: 0;
+    margin: 4px 0;
+    padding: 10px 0;
+}
+
+.m3-navdrawer.mini a.mud-nav-link .mud-nav-link-text {
+    display: none;
+}
+
+.m3-navdrawer.mini a.mud-nav-link::after {
+    --hit: 44px;
+}
+
+.m3-navdrawer.mini a.mud-nav-link .mud-icon-root {
+    font-size: 26px;
+}
+
+.m3-navdrawer.mini a.mud-nav-link.active .mud-icon-root,
+.m3-navdrawer.mini a.mud-nav-link.mud-nav-link-active .mud-icon-root {
+    color: var(--m3-nav-active-fg) !important;
+}
