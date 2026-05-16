@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using OutWit.Common.Logging.Loki;
 using OutWit.Common.Logging.Query;
+using OutWit.Common.Logging.Query.Model;
 using OutWit.Shared.Logging.Provider.Loki;
 using OutWit.Shared.Logging.Providers;
 
@@ -99,6 +100,62 @@ namespace OutWit.Shared.Logging.Provider.Loki.Tests
             var services = new ServiceCollection();
 
             Assert.Throws<InvalidOperationException>(() => plugin.Initialize(services));
+        }
+
+        #endregion
+
+        #region BaseFilters
+
+        [Test]
+        public void BaseFiltersDefaultIsEmptyWhenUnsetTest()
+        {
+            Environment.SetEnvironmentVariable("Loki__BaseUrl", "http://loki.example.invalid:3100");
+            try
+            {
+                var plugin = new LokiLogProviderPlugin();
+                var services = new ServiceCollection();
+                plugin.Initialize(services);
+
+                var sp = services.BuildServiceProvider();
+                var options = sp.GetRequiredService<LokiOptions>();
+
+                Assert.That(options.BaseFilters, Is.Not.Null);
+                Assert.That(options.BaseFilters, Is.Empty);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("Loki__BaseUrl", null);
+            }
+        }
+
+        [Test]
+        public void BaseFiltersBindFromEnvironmentVariablesTest()
+        {
+            Environment.SetEnvironmentVariable("Loki__BaseUrl", "http://loki.example.invalid:3100");
+            Environment.SetEnvironmentVariable("Loki__BaseFilters__0__Attribute", "service.name");
+            Environment.SetEnvironmentVariable("Loki__BaseFilters__0__Operator", "Equals");
+            Environment.SetEnvironmentVariable("Loki__BaseFilters__0__Values__0", "WitIdentity");
+            try
+            {
+                var plugin = new LokiLogProviderPlugin();
+                var services = new ServiceCollection();
+                plugin.Initialize(services);
+
+                var sp = services.BuildServiceProvider();
+                var options = sp.GetRequiredService<LokiOptions>();
+
+                Assert.That(options.BaseFilters, Has.Length.EqualTo(1));
+                Assert.That(options.BaseFilters[0].Attribute, Is.EqualTo("service.name"));
+                Assert.That(options.BaseFilters[0].Operator, Is.EqualTo(LogFilterOperator.Equals));
+                Assert.That(options.BaseFilters[0].Values, Is.EqualTo(new[] { "WitIdentity" }));
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("Loki__BaseUrl", null);
+                Environment.SetEnvironmentVariable("Loki__BaseFilters__0__Attribute", null);
+                Environment.SetEnvironmentVariable("Loki__BaseFilters__0__Operator", null);
+                Environment.SetEnvironmentVariable("Loki__BaseFilters__0__Values__0", null);
+            }
         }
 
         #endregion
