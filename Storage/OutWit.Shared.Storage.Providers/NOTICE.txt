@@ -1,0 +1,5 @@
+OutWit.Shared.Storage.Providers
+Copyright 2020-2026 Dmitry Ratner
+Project home: https://ratner.io/
+
+OutWit.Shared.Storage.Providers is part of the OutWit ecosystem.

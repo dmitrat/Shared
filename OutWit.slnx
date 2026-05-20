@@ -25,6 +25,11 @@
     <Project Path="Email/OutWit.Shared.Email.Provider.Smtp/OutWit.Shared.Email.Provider.Smtp.csproj" />
     <Project Path="Email/OutWit.Shared.Email.Providers/OutWit.Shared.Email.Providers.csproj" />
   </Folder>
+  <Folder Name="/Storage/">
+    <Project Path="Storage/OutWit.Shared.Storage.Provider.Disk/OutWit.Shared.Storage.Provider.Disk.csproj" />
+    <Project Path="Storage/OutWit.Shared.Storage.Provider.Disk.Tests/OutWit.Shared.Storage.Provider.Disk.Tests.csproj" />
+    <Project Path="Storage/OutWit.Shared.Storage.Providers/OutWit.Shared.Storage.Providers.csproj" />
+  </Folder>
   <Folder Name="/Logging/">
     <Project Path="Logging/OutWit.Shared.Logging.Blazor/OutWit.Shared.Logging.Blazor.csproj" />
     <Project Path="Logging/OutWit.Shared.Logging.Provider.File/OutWit.Shared.Logging.Provider.File.csproj" />

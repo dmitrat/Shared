@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>OutWit.Shared.Storage.Provider.Disk</id>
+    <version>$version$</version>
+    <authors>Dmitry Ratner</authors>
+    <description>Filesystem-backed blob storage plugin for OutWit hosts. Stores each blob as a directory containing its files. Drop into the host's @Storage folder and set Storage__ProviderKey=Disk.</description>
+    <copyright>Copyright © 2026 Dmitry Ratner</copyright>
+    <license type="expression">Apache-2.0</license>
+    <projectUrl>https://github.com/dmitrat/Shared/tree/main/Storage/OutWit.Shared.Storage.Provider.Disk</projectUrl>
+    <tags>OutWit Shared Storage Provider Disk Filesystem Plugin</tags>
+    <readme>README.md</readme>
+    <icon>OutWit-logo.png</icon>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+    <file src="OutWit-logo.png" target="\" />
+    <file src="NOTICE.txt" target="\" />
+    <file src="LICENSE.txt" target="\" />
+    <file src="build\OutWit.Shared.Storage.Provider.Disk.targets" target="build" />
+    <file src="build\OutWit.Shared.Storage.Provider.Disk.targets" target="buildTransitive" />
+    <file src="..\..\@Storage\Release\disk.module\**\*" target="storage\disk.module" />
+    <file src="bin\Release\net10.0\OutWit.Shared.Storage.Provider.Disk.dll" target="lib\net10.0" />
+  </files>
+</package>

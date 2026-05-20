@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0</TargetFrameworks>
+		<Nullable>enable</Nullable>
+
+		<Version>1.0.0</Version>
+
+		<Description>Blob-storage abstractions for OutWit hosts: IBlobStorageProvider (Write/Read/Delete by GUID+filename), IBlobStorageProviderPlugin (a marker over IWitPlugin so transports load via WitPluginLoader), IBlobStorageSettings (config contract), and MemoryPack-friendly BlobInfo / BlobUploadSession models. Drop-in for any backend — Disk / S3 / Azure Blob / GCS — via the plugin model.</Description>
+		<PackageTags>OutWit;Shared;Storage;Blob;Plugins;Plugin;Contract</PackageTags>
+
+		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Storage/OutWit.Shared.Storage.Providers</RepositoryUrl>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="OutWit.Common" Version="1.3.*" />
+		<PackageReference Include="OutWit.Common.Plugins" Version="1.1.*" />
+		<PackageReference Include="MemoryPack" Version="1.21.4" />
+		<!-- Pinned to 10.0.2 because OutWit.Common.Plugins.Abstractions 1.1.2
+			 transitively requires that minimum; per-TFM downgrades trip NU1605. -->
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
+	</ItemGroup>
+
+	<!-- Metadata files for the NuGet package (SDK Pack). LICENSE/NOTICE use .txt
+		 extensions: extensionless files break NuGet's zip writer when packed with
+		 target="\" alongside <license type=...>. -->
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="\" />
+		<None Include="NOTICE.txt" Pack="true" PackagePath="\" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="OutWit-logo.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>

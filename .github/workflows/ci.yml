@@ -57,6 +57,12 @@ jobs:
               - 'Logging/OutWit.Shared.Logging.Provider.Loki/**'
               - 'Logging/OutWit.Shared.Logging.Provider.Loki.Tests/**'
               - 'Logging/OutWit.Shared.Logging.Providers/**'
+            OutWit.Shared.Storage.Providers:
+              - 'Storage/OutWit.Shared.Storage.Providers/**'
+            OutWit.Shared.Storage.Provider.Disk:
+              - 'Storage/OutWit.Shared.Storage.Provider.Disk/**'
+              - 'Storage/OutWit.Shared.Storage.Provider.Disk.Tests/**'
+              - 'Storage/OutWit.Shared.Storage.Providers/**'
 
   run-tests:
     name: Test ${{ matrix.project }}

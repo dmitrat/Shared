@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Storage.Provider.Disk. Copies the plugin module folder from
+    inside the package into the host's output @Storage/disk.module/, where the
+    host's WitPluginLoader<IBlobStorageProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopyDiskBlobStorageProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_DiskBlobStoragePluginFiles Include="$(MSBuildThisFileDirectory)..\storage\disk.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DiskBlobStoragePluginFiles)"
+          DestinationFolder="$(OutputPath)@Storage\disk.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopyDiskBlobStorageProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_DiskBlobStoragePluginPubFiles Include="$(MSBuildThisFileDirectory)..\storage\disk.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_DiskBlobStoragePluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Storage\disk.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

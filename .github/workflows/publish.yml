@@ -18,6 +18,8 @@ on:
           - OutWit.Shared.Logging.Provider.File
           - OutWit.Shared.Logging.Provider.NewRelic
           - OutWit.Shared.Logging.Provider.Loki
+          - OutWit.Shared.Storage.Providers
+          - OutWit.Shared.Storage.Provider.Disk
           - OutWit.Shared.Blazor.Shell
       pushToNuGet:
         description: 'Push to nuget.org'
