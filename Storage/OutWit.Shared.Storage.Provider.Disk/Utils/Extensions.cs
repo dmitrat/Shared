@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OutWit.Common.Configuration;
+using OutWit.Common.Plugins;
 using OutWit.Shared.Storage.Providers;
 
 namespace OutWit.Shared.Storage.Provider.Disk.Utils
@@ -17,8 +18,16 @@ namespace OutWit.Shared.Storage.Provider.Disk.Utils
         /// </summary>
         public static IServiceCollection AddDiskBlobStorage(this IServiceCollection me, string environment)
         {
+            // Route config lookup through the loader-registered home directory
+            // (WitPluginHostContexts). Under shared-context loading
+            // typeof(...).Assembly.Location points at the default-ALC PR-graph
+            // copy, not the staged module folder — so the legacy For(Assembly)
+            // overload reads appsettings.json from the host bin, not from
+            // @Storage/disk.module/. For(IAssemblyContext) uses the path the
+            // loader actually scanned.
+            var pluginContext = WitPluginHostContexts.For(typeof(DiskBlobStorageProviderPlugin).Assembly);
             var configuration = ConfigurationUtils
-                .For(typeof(DiskBlobStorageProviderPlugin).Assembly)
+                .For(pluginContext)
                 .WithEnvironment(environment)
                 .Build();
 
