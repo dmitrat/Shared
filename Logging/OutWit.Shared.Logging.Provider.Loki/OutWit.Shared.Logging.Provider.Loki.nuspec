@@ -11,6 +11,16 @@
     <tags>OutWit Shared Logging Provider Loki Grafana LogQL</tags>
     <readme>README.md</readme>
     <icon>OutWit-logo.png</icon>
+    <!-- See Provider.NewRelic.nuspec for the full rationale — custom nuspec
+         needs explicit <dependencies> so consumers restore the exact
+         OutWit.Common.Logging.<X> version this Provider was compiled against. -->
+    <dependencies>
+      <group targetFramework="net10.0">
+        <dependency id="OutWit.Common.Logging.Loki" version="[2.0.0]" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Logging.Query" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Plugins.Abstractions" version="1.1.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="README.md" target="\" />

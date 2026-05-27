@@ -11,6 +11,21 @@
     <tags>OutWit Shared Logging Provider NewRelic NerdGraph</tags>
     <readme>README.md</readme>
     <icon>OutWit-logo.png</icon>
+    <!-- Custom nuspec doesn't auto-import PackageReference constraints from
+         the csproj. Declare them explicitly here so consumers (e.g. WitCloud)
+         restore the SAME OutWit.Common.Logging.NewRelic version this Provider
+         was compiled against. Without the [2.1.0] exact pin, consumers can
+         pull a transitive 2.0.0 (from e.g. OutWit.Identity.Shared) while
+         this Provider's PEM references 2.1.0.0 → runtime FileLoadException
+         on plugin Initialize. Discovered on engine.omnibuscloud.com 2026-05-27.
+         Bump the pin in lockstep when bumping OutWit.Common.Logging.NewRelic. -->
+    <dependencies>
+      <group targetFramework="net10.0">
+        <dependency id="OutWit.Common.Logging.NewRelic" version="[2.1.0]" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Logging.Query" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Plugins.Abstractions" version="1.1.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
     <file src="README.md" target="\" />

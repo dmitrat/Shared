@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.1.1</Version>
+		<Version>1.1.2</Version>
 		<TargetFramework>net10.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -45,6 +45,19 @@
 	<Target Name="CopyPluginToOutputDirectory"
 			AfterTargets="Build"
 			Condition="'$(SolutionDir)' != '' And '$(SolutionDir)' != '*Undefined*'">
+		<!-- Wipe the staging folder before copying so stale DLLs from a
+		     previous build (under a different OutWit.Common.Logging.NewRelic
+		     version pin) cannot survive into the published nupkg. Without
+		     this, a local rebuild after bumping the Common.Logging.NewRelic
+		     reference would package a mix of old + new DLLs because
+		     SkipUnchangedFiles=true compares timestamps and could miss
+		     same-filename version differences. Discovered while debugging
+		     a runtime FileLoadException on engine.omnibuscloud.com
+		     (2026-05-27): consumer expected v2.1.0.0 but the bundled DLL
+		     was a stale v2.0.0 — even after bumping the pin to [2.1.0]. -->
+		<RemoveDir Directories="$(SolutionDir)@Logging\$(Configuration)\newrelic.module"
+				   Condition="Exists('$(SolutionDir)@Logging\$(Configuration)\newrelic.module')" />
+
 		<ItemGroup>
 			<PluginFiles Include="$(TargetDir)*.dll" />
 			<PluginFiles Include="$(TargetDir)$(TargetName).deps.json"
@@ -55,7 +68,7 @@
 
 		<Copy SourceFiles="@(PluginFiles)"
 			  DestinationFolder="$(SolutionDir)@Logging\$(Configuration)\newrelic.module\%(RecursiveDir)"
-			  SkipUnchangedFiles="true"
+			  SkipUnchangedFiles="false"
 			  OverwriteReadOnlyFiles="true" />
 	</Target>
 
