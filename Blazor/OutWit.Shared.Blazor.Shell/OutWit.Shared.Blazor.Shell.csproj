@@ -5,9 +5,9 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 
-		<Description>Generic Blazor WebAssembly admin shell built on MudBlazor and Material 3: AppShellLayout (drawer + appbar + theme-toggle), default light/dark theme, simple helpers. No product-specific dependencies — drop into any MudBlazor WASM app, pass Title/Header/LogoUrl as parameters, fill HeaderEnd / Footer slots for product-specific bits.</Description>
+		<Description>Generic Blazor WebAssembly admin shell built on MudBlazor and Material 3: AppShellLayout (drawer + appbar + theme-toggle), AppShellFooter (dependency-free version badge), default light/dark theme, simple helpers. No product-specific dependencies — drop into any MudBlazor WASM app, pass Title/Header/LogoUrl as parameters, fill HeaderEnd / Footer slots for product-specific bits.</Description>
 		<PackageTags>OutWit;Shared;Blazor;Shell;MudBlazor;Material3;M3;Layout;WASM</PackageTags>
 
 		<RepositoryUrl>https://github.com/dmitrat/Shared/tree/main/Blazor/OutWit.Shared.Blazor.Shell</RepositoryUrl>

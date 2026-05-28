@@ -1,0 +1,61 @@
+@using System.Reflection
+
+@* Generic version footer for AppShellLayout's Footer slot. Dependency-free:
+   by default it reads the host app's AssemblyInformationalVersion (MinVer sets
+   this from git tags), so any service gets a version badge for free. Styling is
+   inline + MudBlazor typography so it renders without the consumer linking any
+   Shell CSS, and stays theme-aware (light/dark) via MudText. *@
+
+@if (!string.IsNullOrWhiteSpace(DisplayVersion) || !string.IsNullOrEmpty(EnvironmentBadge))
+{
+    <div class="app-shell-footer"
+         style="position: fixed; right: 14px; bottom: 6px; z-index: 1200; display: flex; align-items: center; gap: 8px; pointer-events: none;"
+         title="@ResolvedVersion">
+        @if (!string.IsNullOrEmpty(EnvironmentBadge))
+        {
+            <MudText Typo="Typo.caption" Style="opacity: 0.75; font-weight: 600;">@EnvironmentBadge</MudText>
+        }
+        @if (!string.IsNullOrWhiteSpace(DisplayVersion))
+        {
+            <MudText Typo="Typo.caption" Style="opacity: 0.55;">@Prefix@DisplayVersion</MudText>
+        }
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// Explicit version override. When left unset, the host app's
+    /// <c>AssemblyInformationalVersion</c> (MinVer-derived) is used.
+    /// </summary>
+    [Parameter] public string? Version { get; set; }
+
+    /// <summary>
+    /// Optional environment name. A badge is rendered only for non-Production
+    /// values (e.g. "Staging", "Docker") to flag non-prod builds at a glance.
+    /// </summary>
+    [Parameter] public string? Environment { get; set; }
+
+    /// <summary>Prefix rendered before the version number. Default <c>"v"</c>.</summary>
+    [Parameter] public string Prefix { get; set; } = "v";
+
+    private string? ResolvedVersion => string.IsNullOrWhiteSpace(Version)
+        ? Assembly.GetEntryAssembly()?
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+        : Version;
+
+    // Strip the "+<gitsha>" build-metadata suffix MinVer appends.
+    private string DisplayVersion
+    {
+        get
+        {
+            var raw = ResolvedVersion;
+            return string.IsNullOrWhiteSpace(raw) ? string.Empty : raw.Split('+')[0];
+        }
+    }
+
+    private string? EnvironmentBadge =>
+        !string.IsNullOrEmpty(Environment) &&
+        !Environment.Equals("Production", StringComparison.OrdinalIgnoreCase)
+            ? Environment
+            : null;
+}
