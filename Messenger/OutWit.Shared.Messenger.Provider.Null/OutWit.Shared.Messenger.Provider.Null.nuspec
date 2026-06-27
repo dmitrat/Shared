@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>OutWit.Shared.Messenger.Provider.Null</id>
+    <version>$version$</version>
+    <authors>Dmitry Ratner</authors>
+    <description>Zero-config fallback messenger plugin for OutWit hosts. LogOnly mode prints messages to logs (dev / staging); Drop mode fails fast. Drop into the host's @Messenger folder and set Messenger__ProviderKey=Null.</description>
+    <copyright>Copyright © 2026 Dmitry Ratner</copyright>
+    <license type="expression">Apache-2.0</license>
+    <projectUrl>https://github.com/dmitrat/Shared/tree/main/Messenger/OutWit.Shared.Messenger.Provider.Null</projectUrl>
+    <tags>OutWit Shared Messenger Provider Null Fallback</tags>
+    <readme>README.md</readme>
+    <icon>OutWit-logo.png</icon>
+  </metadata>
+  <files>
+    <file src="README.md" target="\" />
+    <file src="OutWit-logo.png" target="\" />
+    <file src="NOTICE.txt" target="\" />
+    <file src="LICENSE.txt" target="\" />
+    <file src="build\OutWit.Shared.Messenger.Provider.Null.targets" target="build" />
+    <file src="build\OutWit.Shared.Messenger.Provider.Null.targets" target="buildTransitive" />
+    <file src="..\..\@Messenger\Release\null.module\**\*" target="messenger\null.module" />
+    <file src="bin\Release\net10.0\OutWit.Shared.Messenger.Provider.Null.dll" target="lib\net10.0" />
+  </files>
+</package>

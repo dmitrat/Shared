@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Messenger.Provider.Null. Copies the plugin module folder from inside
+    the package into the host's output @Messenger/null.module/, where the host's
+    WitPluginLoader<IMessengerProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopyNullMessengerProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_NullMessengerPluginFiles Include="$(MSBuildThisFileDirectory)..\messenger\null.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_NullMessengerPluginFiles)"
+          DestinationFolder="$(OutputPath)@Messenger\null.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopyNullMessengerProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_NullMessengerPluginPubFiles Include="$(MSBuildThisFileDirectory)..\messenger\null.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_NullMessengerPluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Messenger\null.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

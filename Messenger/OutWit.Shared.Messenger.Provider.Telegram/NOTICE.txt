@@ -1,0 +1,9 @@
+OutWit.Shared.Email.Provider.Resend
+Copyright 2020-2026 Dmitry Ratner
+Project home: https://ratner.io/
+
+OutWit.Shared.Email.Provider.Resend is part of the OutWit ecosystem.
+
+This package depends on Resend .NET SDK (https://github.com/resend/resend-dotnet),
+which is licensed under the MIT License. See its own NOTICE / license for
+attribution requirements.

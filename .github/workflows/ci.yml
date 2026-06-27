@@ -41,6 +41,16 @@ jobs:
               - 'Email/OutWit.Shared.Email.Provider.Resend/**'
               - 'Email/OutWit.Shared.Email.Provider.Resend.Tests/**'
               - 'Email/OutWit.Shared.Email.Providers/**'
+            OutWit.Shared.Messenger.Providers:
+              - 'Messenger/OutWit.Shared.Messenger.Providers/**'
+            OutWit.Shared.Messenger.Provider.Null:
+              - 'Messenger/OutWit.Shared.Messenger.Provider.Null/**'
+              - 'Messenger/OutWit.Shared.Messenger.Provider.Null.Tests/**'
+              - 'Messenger/OutWit.Shared.Messenger.Providers/**'
+            OutWit.Shared.Messenger.Provider.Telegram:
+              - 'Messenger/OutWit.Shared.Messenger.Provider.Telegram/**'
+              - 'Messenger/OutWit.Shared.Messenger.Provider.Telegram.Tests/**'
+              - 'Messenger/OutWit.Shared.Messenger.Providers/**'
             OutWit.Shared.Logging.Blazor:
               - 'Logging/OutWit.Shared.Logging.Blazor/**'
             OutWit.Shared.Logging.Providers:

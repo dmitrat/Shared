@@ -1,0 +1,28 @@
+<Project>
+
+  <!--
+    Auto-imported by NuGet when a host adds a PackageReference to
+    OutWit.Shared.Messenger.Provider.Telegram. Copies the plugin module folder from
+    inside the package into the host's output @Messenger/telegram.module/, where the
+    host's WitPluginLoader<IMessengerProviderPlugin> picks it up.
+  -->
+
+  <Target Name="_CopyTelegramMessengerProvider" AfterTargets="Build">
+    <ItemGroup>
+      <_TelegramMessengerPluginFiles Include="$(MSBuildThisFileDirectory)..\messenger\telegram.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_TelegramMessengerPluginFiles)"
+          DestinationFolder="$(OutputPath)@Messenger\telegram.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="_CopyTelegramMessengerProviderPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_TelegramMessengerPluginPubFiles Include="$(MSBuildThisFileDirectory)..\messenger\telegram.module\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_TelegramMessengerPluginPubFiles)"
+          DestinationFolder="$(PublishDir)@Messenger\telegram.module\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

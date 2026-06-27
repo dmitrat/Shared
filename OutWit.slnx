@@ -25,6 +25,13 @@
     <Project Path="Email/OutWit.Shared.Email.Provider.Smtp/OutWit.Shared.Email.Provider.Smtp.csproj" />
     <Project Path="Email/OutWit.Shared.Email.Providers/OutWit.Shared.Email.Providers.csproj" />
   </Folder>
+  <Folder Name="/Messenger/">
+    <Project Path="Messenger/OutWit.Shared.Messenger.Providers/OutWit.Shared.Messenger.Providers.csproj" />
+    <Project Path="Messenger/OutWit.Shared.Messenger.Provider.Null/OutWit.Shared.Messenger.Provider.Null.csproj" />
+    <Project Path="Messenger/OutWit.Shared.Messenger.Provider.Null.Tests/OutWit.Shared.Messenger.Provider.Null.Tests.csproj" />
+    <Project Path="Messenger/OutWit.Shared.Messenger.Provider.Telegram/OutWit.Shared.Messenger.Provider.Telegram.csproj" />
+    <Project Path="Messenger/OutWit.Shared.Messenger.Provider.Telegram.Tests/OutWit.Shared.Messenger.Provider.Telegram.Tests.csproj" />
+  </Folder>
   <Folder Name="/Storage/">
     <Project Path="Storage/OutWit.Shared.Storage.Provider.Disk/OutWit.Shared.Storage.Provider.Disk.csproj" />
     <Project Path="Storage/OutWit.Shared.Storage.Provider.Disk.Tests/OutWit.Shared.Storage.Provider.Disk.Tests.csproj" />
