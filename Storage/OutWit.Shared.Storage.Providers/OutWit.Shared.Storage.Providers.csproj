@@ -4,7 +4,7 @@
 		<TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0</TargetFrameworks>
 		<Nullable>enable</Nullable>
 
-		<Version>1.0.0</Version>
+		<Version>1.0.1</Version>
 
 		<Description>Blob-storage abstractions for OutWit hosts: IBlobStorageProvider (Write/Read/Delete by GUID+filename), IBlobStorageProviderPlugin (a marker over IWitPlugin so transports load via WitPluginLoader), IBlobStorageSettings (config contract), and MemoryPack-friendly BlobInfo / BlobUploadSession models. Drop-in for any backend — Disk / S3 / Azure Blob / GCS — via the plugin model.</Description>
 		<PackageTags>OutWit;Shared;Storage;Blob;Plugins;Plugin;Contract</PackageTags>
