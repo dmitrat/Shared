@@ -16,9 +16,9 @@
          OutWit.Common.Logging.<X> version this Provider was compiled against. -->
     <dependencies>
       <group targetFramework="net10.0">
-        <dependency id="OutWit.Common.Logging.Loki" version="[2.0.0]" exclude="Build,Analyzers" />
-        <dependency id="OutWit.Common.Logging.Query" version="1.0.0" exclude="Build,Analyzers" />
-        <dependency id="OutWit.Common.Plugins.Abstractions" version="1.1.0" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Logging.Loki" version="[2.0.2]" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Logging.Query" version="1.0.1" exclude="Build,Analyzers" />
+        <dependency id="OutWit.Common.Plugins.Abstractions" version="1.2.2" exclude="Build,Analyzers" />
       </group>
     </dependencies>
   </metadata>
