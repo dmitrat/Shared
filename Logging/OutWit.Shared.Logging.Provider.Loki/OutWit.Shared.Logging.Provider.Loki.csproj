@@ -22,7 +22,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OutWit.Common.Plugins.Abstractions" Version="1.1.*" />
+		<PackageReference Include="OutWit.Common.Plugins.Abstractions" Version="1.2.*" />
 		<PackageReference Include="OutWit.Common.Logging.Query" Version="1.0.*" />
 		<!-- Hard-pin (square brackets = exact) so the version compiled against
 		     matches the DLL that CopyPluginToOutputDirectory bundles into
@@ -30,12 +30,12 @@
 		     floating `2.*` causes drift between Provider's compiled-against
 		     and consumer's restored version. Bump in lockstep when bumping
 		     OutWit.Common.Logging.Loki. -->
-		<PackageReference Include="OutWit.Common.Logging.Loki" Version="[2.0.0]" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
+		<PackageReference Include="OutWit.Common.Logging.Loki" Version="2.0.*" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>

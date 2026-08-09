@@ -18,12 +18,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.5" />
-		<PackageReference Include="MudBlazor" Version="9.1.0" />
-		<PackageReference Include="MudBlazor.FontIcons.MaterialSymbols" Version="1.4.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.10" />
+		<PackageReference Include="MudBlazor" Version="9.8.0" />
+		<PackageReference Include="MudBlazor.FontIcons.MaterialSymbols" Version="1.5.0" />
 		<PackageReference Include="OutWit.Common.MVVM.Blazor" Version="2.0.*" />
 		<PackageReference Include="OutWit.Common.Logging.Query" Version="1.0.*" />
-		<PackageReference Include="OutWit.Common.Logging.NewRelic" Version="1.0.*" />
+		<PackageReference Include="OutWit.Common.Logging.NewRelic" Version="2.1.*" />
 	</ItemGroup>
 
 	<!-- NuGet metadata files. Auto-pack is disabled in Directory.Build.props to avoid

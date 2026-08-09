@@ -13,7 +13,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OutWit.Common.Plugins.Abstractions" Version="1.1.*" />
+		<PackageReference Include="OutWit.Common.Plugins.Abstractions" Version="1.2.*" />
 		<PackageReference Include="OutWit.Common.Email" Version="1.0.*" />
 	</ItemGroup>
 
