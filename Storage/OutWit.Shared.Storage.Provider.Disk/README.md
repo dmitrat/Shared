@@ -34,8 +34,17 @@ The plugin ships an `appsettings.json` with a single key:
 
 - Relative paths resolve from `AppContext.BaseDirectory`.
 - The directory is created on first use if missing.
-- Per-host overrides via `appsettings.{Environment}.json` and standard
-  environment variables (`DiskBlobStorage__StoragePath=...`).
+- Precedence, lowest to highest: the bundled `appsettings.json`, the
+  plugin's `appsettings.{Environment}.json`, then the process environment
+  variable `DiskBlobStorage__StoragePath` (since 1.1.2 - earlier versions
+  read only the JSON files, so the environment variable was silently
+  ignored and the store stayed at `<app>/@Blobs`).
+- Containers: `<app>/@Blobs` lives in the container's writable layer and is
+  lost when the container is recreated, while the blob metadata in the host's
+  database survives - every blob uploaded before the recreate then answers
+  "not found". Point the store at a mounted volume
+  (`DiskBlobStorage__StoragePath=/app/ControllerStorage/Blobs` in WitCloud's
+  image) so the files outlive the container.
 
 ## Layout on disk
 

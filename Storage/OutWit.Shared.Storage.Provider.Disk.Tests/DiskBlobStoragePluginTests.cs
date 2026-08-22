@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using OutWit.Shared.Storage.Provider.Disk;
+using OutWit.Shared.Storage.Provider.Disk.Utils;
 using OutWit.Shared.Storage.Providers;
 
 namespace OutWit.Shared.Storage.Provider.Disk.Tests
@@ -7,6 +8,12 @@ namespace OutWit.Shared.Storage.Provider.Disk.Tests
     [TestFixture]
     public class DiskBlobStoragePluginTests
     {
+        #region Constants
+
+        private const string STORAGE_PATH_VARIABLE = "DiskBlobStorage__StoragePath";
+
+        #endregion
+
         #region Fields
 
         private string m_testDir = null!;
@@ -54,6 +61,65 @@ namespace OutWit.Shared.Storage.Provider.Disk.Tests
 
             Assert.That(provider, Is.Not.Null);
             Assert.That(provider, Is.InstanceOf<DiskBlobStorageProvider>());
+        }
+
+        #endregion
+
+        #region Configuration Tests
+
+        [Test]
+        public void ResolveSettingsDefaultsToBlobsFolderUnderBaseDirectoryTest()
+        {
+            using var scope = new EnvironmentVariableScope(STORAGE_PATH_VARIABLE, null);
+
+            var settings = Extensions.ResolveSettings("Production");
+
+            Assert.That(settings.StoragePath, Is.EqualTo(Path.Combine(AppContext.BaseDirectory, "@Blobs")));
+        }
+
+        [Test]
+        public void ResolveSettingsHonoursTheEnvironmentVariableTest()
+        {
+            // The documented docker contract: an absolute path on a mounted volume.
+            using var scope = new EnvironmentVariableScope(STORAGE_PATH_VARIABLE, m_testDir);
+
+            var settings = Extensions.ResolveSettings("Production");
+
+            Assert.That(settings.StoragePath, Is.EqualTo(m_testDir));
+        }
+
+        [Test]
+        public void ResolveSettingsRootsARelativeEnvironmentValueUnderBaseDirectoryTest()
+        {
+            using var scope = new EnvironmentVariableScope(STORAGE_PATH_VARIABLE, "data/blobs");
+
+            var settings = Extensions.ResolveSettings("Production");
+
+            Assert.That(settings.StoragePath, Is.EqualTo(Path.Combine(AppContext.BaseDirectory, "data/blobs")));
+        }
+
+        [Test]
+        public async Task AddDiskBlobStorageRegistersTheResolvedPathTest()
+        {
+            using var scope = new EnvironmentVariableScope(STORAGE_PATH_VARIABLE, m_testDir);
+
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddDiskBlobStorage("Production");
+
+            var serviceProvider = services.BuildServiceProvider();
+            var settings = serviceProvider.GetRequiredService<DiskBlobStorageSettings>();
+            var provider = serviceProvider.GetRequiredService<IBlobStorageProvider>();
+
+            Assert.That(settings.StoragePath, Is.EqualTo(m_testDir));
+            Assert.That(provider, Is.InstanceOf<DiskBlobStorageProvider>());
+
+            // The provider writes where the variable points, not under the host binary.
+            var blobId = Guid.NewGuid();
+            await using (var stream = new MemoryStream("env"u8.ToArray()))
+                await provider.WriteAsync(blobId, "data.bin", stream);
+
+            Assert.That(File.Exists(Path.Combine(m_testDir, blobId.ToString("N"), "data.bin")), Is.True);
         }
 
         #endregion
@@ -135,6 +201,31 @@ namespace OutWit.Shared.Storage.Provider.Disk.Tests
 
             var readChunk3 = await provider.ReadChunkAsync(blobId, "data.bin", 2048, 512);
             Assert.That(readChunk3, Is.EqualTo(chunk3));
+        }
+
+        #endregion
+
+        #region Nested Types
+
+        /// <summary>
+        /// Sets a process environment variable for the test and restores the previous value.
+        /// </summary>
+        private sealed class EnvironmentVariableScope : IDisposable
+        {
+            private readonly string m_name;
+            private readonly string? m_previous;
+
+            public EnvironmentVariableScope(string name, string? value)
+            {
+                m_name = name;
+                m_previous = Environment.GetEnvironmentVariable(name);
+                Environment.SetEnvironmentVariable(name, value);
+            }
+
+            public void Dispose()
+            {
+                Environment.SetEnvironmentVariable(m_name, m_previous);
+            }
         }
 
         #endregion
