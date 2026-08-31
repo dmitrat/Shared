@@ -92,11 +92,13 @@ jobs:
               - 'Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/**'
               - 'Secrets/OutWit.Shared.Secrets.Providers/**'
               - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+              - '.github/workflows/ci.yml'
             OutWit.Shared.Secrets.Provider.MacOS:
               - 'Secrets/OutWit.Shared.Secrets.Provider.MacOS/**'
               - 'Secrets/OutWit.Shared.Secrets.Provider.MacOS.Tests/**'
               - 'Secrets/OutWit.Shared.Secrets.Providers/**'
               - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+              - '.github/workflows/ci.yml'
             OutWit.Shared.Secrets.Desktop:
               - 'Secrets/**'
 
