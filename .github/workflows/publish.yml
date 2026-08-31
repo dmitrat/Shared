@@ -23,6 +23,13 @@ on:
           - OutWit.Shared.Logging.Provider.Loki
           - OutWit.Shared.Storage.Providers
           - OutWit.Shared.Storage.Provider.Disk
+          - OutWit.Shared.Secrets.Providers
+          - OutWit.Shared.Secrets.Conformance
+          - OutWit.Shared.Secrets.Provider.Windows
+          - OutWit.Shared.Secrets.Provider.File
+          - OutWit.Shared.Secrets.Provider.Linux
+          - OutWit.Shared.Secrets.Provider.MacOS
+          - OutWit.Shared.Secrets.Desktop
           - OutWit.Shared.Blazor.Shell
       pushToNuGet:
         description: 'Push to nuget.org'

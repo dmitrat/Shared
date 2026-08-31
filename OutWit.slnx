@@ -37,6 +37,21 @@
     <Project Path="Storage/OutWit.Shared.Storage.Provider.Disk.Tests/OutWit.Shared.Storage.Provider.Disk.Tests.csproj" />
     <Project Path="Storage/OutWit.Shared.Storage.Providers/OutWit.Shared.Storage.Providers.csproj" />
   </Folder>
+  <Folder Name="/Secrets/">
+    <Project Path="Secrets/OutWit.Shared.Secrets.Conformance/OutWit.Shared.Secrets.Conformance.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Desktop/OutWit.Shared.Secrets.Desktop.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Desktop.Tests/OutWit.Shared.Secrets.Desktop.Tests.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.Linux/OutWit.Shared.Secrets.Provider.Linux.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/OutWit.Shared.Secrets.Provider.Linux.Tests.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.MacOS/OutWit.Shared.Secrets.Provider.MacOS.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.MacOS.Tests/OutWit.Shared.Secrets.Provider.MacOS.Tests.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.File/OutWit.Shared.Secrets.Provider.File.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.File.Tests/OutWit.Shared.Secrets.Provider.File.Tests.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.Windows/OutWit.Shared.Secrets.Provider.Windows.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Provider.Windows.Tests/OutWit.Shared.Secrets.Provider.Windows.Tests.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Providers/OutWit.Shared.Secrets.Providers.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Providers.Tests/OutWit.Shared.Secrets.Providers.Tests.csproj" />
+  </Folder>
   <Folder Name="/Logging/">
     <Project Path="Logging/OutWit.Shared.Logging.Blazor/OutWit.Shared.Logging.Blazor.csproj" />
     <Project Path="Logging/OutWit.Shared.Logging.Provider.File/OutWit.Shared.Logging.Provider.File.csproj" />

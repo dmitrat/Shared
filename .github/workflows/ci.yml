@@ -73,6 +73,32 @@ jobs:
               - 'Storage/OutWit.Shared.Storage.Provider.Disk/**'
               - 'Storage/OutWit.Shared.Storage.Provider.Disk.Tests/**'
               - 'Storage/OutWit.Shared.Storage.Providers/**'
+            OutWit.Shared.Secrets.Providers:
+              - 'Secrets/OutWit.Shared.Secrets.Providers/**'
+              - 'Secrets/OutWit.Shared.Secrets.Providers.Tests/**'
+              - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+            OutWit.Shared.Secrets.Provider.Windows:
+              - 'Secrets/OutWit.Shared.Secrets.Provider.Windows/**'
+              - 'Secrets/OutWit.Shared.Secrets.Provider.Windows.Tests/**'
+              - 'Secrets/OutWit.Shared.Secrets.Providers/**'
+              - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+            OutWit.Shared.Secrets.Provider.File:
+              - 'Secrets/OutWit.Shared.Secrets.Provider.File/**'
+              - 'Secrets/OutWit.Shared.Secrets.Provider.File.Tests/**'
+              - 'Secrets/OutWit.Shared.Secrets.Providers/**'
+              - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+            OutWit.Shared.Secrets.Provider.Linux:
+              - 'Secrets/OutWit.Shared.Secrets.Provider.Linux/**'
+              - 'Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/**'
+              - 'Secrets/OutWit.Shared.Secrets.Providers/**'
+              - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+            OutWit.Shared.Secrets.Provider.MacOS:
+              - 'Secrets/OutWit.Shared.Secrets.Provider.MacOS/**'
+              - 'Secrets/OutWit.Shared.Secrets.Provider.MacOS.Tests/**'
+              - 'Secrets/OutWit.Shared.Secrets.Providers/**'
+              - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
+            OutWit.Shared.Secrets.Desktop:
+              - 'Secrets/**'
 
   run-tests:
     name: Test ${{ matrix.project }}
@@ -124,3 +150,61 @@ jobs:
       - name: Run tests
         if: steps.paths.outputs.hasTests == 'true'
         run: dotnet test "${{ steps.paths.outputs.testCsproj }}" --configuration Release --no-restore
+
+  # The Secrets Linux provider talks to the Secret Service, which is a session
+  # service: the hosted agent gets a D-Bus session and an unlocked gnome-keyring
+  # for the duration of the test run, or the conformance rows would honestly
+  # answer Unavailable and fail.
+  test-secrets-linux:
+    name: Test OutWit.Shared.Secrets.Provider.Linux (unlocked keyring)
+    needs: discover-changes
+    if: contains(needs.discover-changes.outputs.projects, 'OutWit.Shared.Secrets.Provider.Linux')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install keyring
+        run: sudo apt-get update && sudo apt-get install -y dbus libsecret-1-0 gnome-keyring
+
+      - name: Restore
+        run: dotnet restore Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/OutWit.Shared.Secrets.Provider.Linux.Tests.csproj
+
+      - name: Test under an unlocked keyring
+        run: |
+          dbus-run-session -- bash -c '
+            echo -n "" | gnome-keyring-daemon --unlock --replace --components=secrets
+            dotnet test Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/OutWit.Shared.Secrets.Provider.Linux.Tests.csproj --configuration Release --no-restore
+          '
+
+  # The Secrets macOS provider uses the default keychain; the job creates an
+  # unlocked one with no auto-lock so nothing prompts on a headless agent.
+  test-secrets-macos:
+    name: Test OutWit.Shared.Secrets.Provider.MacOS (keychain)
+    needs: discover-changes
+    if: contains(needs.discover-changes.outputs.projects, 'OutWit.Shared.Secrets.Provider.MacOS')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Create an unlocked default keychain
+        run: |
+          security create-keychain -p ci ci.keychain-db
+          security default-keychain -s ci.keychain-db
+          security unlock-keychain -p ci ci.keychain-db
+          security set-keychain-settings ci.keychain-db
+
+      - name: Restore
+        run: dotnet restore Secrets/OutWit.Shared.Secrets.Provider.MacOS.Tests/OutWit.Shared.Secrets.Provider.MacOS.Tests.csproj
+
+      - name: Run tests
+        run: dotnet test Secrets/OutWit.Shared.Secrets.Provider.MacOS.Tests/OutWit.Shared.Secrets.Provider.MacOS.Tests.csproj --configuration Release --no-restore
