@@ -270,6 +270,20 @@ namespace OutWit.Shared.Secrets.Conformance
 
         #endregion
 
+        #region Check Tests
+
+        [Test]
+        public async Task CheckOnAReachableStoreSucceedsTest()
+        {
+            SecretOutcome outcome = await m_store.CheckAsync();
+
+            Assert.That(outcome.IsSuccess(), Is.True,
+                $"The store under test is expected reachable in its test environment; " +
+                $"it answered {outcome.Status}: {outcome.Message}");
+        }
+
+        #endregion
+
         #region Description Tests
 
         [Test]

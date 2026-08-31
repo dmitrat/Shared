@@ -34,10 +34,11 @@ namespace OutWit.Shared.Secrets.Providers.Tests
 
         #region Functions
 
-        protected override Task<SecretOutcome> DoStoreAsync(string key, ReadOnlyMemory<byte> secret,
+        protected override Task<SecretOutcome> DoStoreAsync(string key, byte[] secret,
             CancellationToken token)
         {
-            m_secrets[key] = secret.ToArray();
+            // The base clears the buffer as soon as this returns — keep a copy.
+            m_secrets[key] = (byte[])secret.Clone();
             return Task.FromResult(new SecretOutcome { Status = SecretStatus.Found });
         }
 

@@ -46,6 +46,19 @@ namespace OutWit.Shared.Secrets.Providers.Tests
         }
 
         [Test]
+        public void FingerprintIsStableAndInjectiveForCaseTest()
+        {
+            string first = SecretKeys.Fingerprint("Test.Product/Purpose");
+            string second = SecretKeys.Fingerprint("Test.Product/Purpose");
+            string cased = SecretKeys.Fingerprint("Test.Product/purpose");
+
+            Assert.That(first, Is.EqualTo(second), "The fingerprint is a durability contract");
+            Assert.That(first, Does.Match("^[0-9a-f]{8}$"));
+            Assert.That(cased, Is.Not.EqualTo(first),
+                "Two keys differing only in case must fingerprint apart");
+        }
+
+        [Test]
         public void IsValidAgreesWithValidateTest()
         {
             Assert.That(SecretKeys.IsValid("Norav.Bridge/AgentCredential"), Is.True);

@@ -65,6 +65,106 @@ namespace OutWit.Shared.Secrets.Providers.Tests
 
         #endregion
 
+        #region Normalization Tests
+
+        [Test]
+        public async Task StoreAnsweringNotFoundIsNormalizedToFailedTest()
+        {
+            var store = new SecretStoreMisbehaving
+            {
+                StoreAnswer = new SecretOutcome { Status = SecretStatus.NotFound, Message = "mis-mapped" }
+            };
+
+            SecretOutcome outcome = await store.StoreAsync("Test/Key", new byte[] { 1 });
+
+            Assert.That(outcome.Status, Is.EqualTo(SecretStatus.Failed),
+                "A store that wrote nothing must never look like success");
+            Assert.That(outcome.IsSuccess(), Is.False);
+        }
+
+        [Test]
+        public async Task ReadAnsweringFoundWithEmptySecretIsNormalizedToFailedTest()
+        {
+            var store = new SecretStoreMisbehaving
+            {
+                ReadAnswer = new SecretResult { Status = SecretStatus.Found, Secret = Array.Empty<byte>() }
+            };
+
+            SecretResult result = await store.ReadAsync("Test/Key");
+
+            Assert.That(result.Status, Is.EqualTo(SecretStatus.Failed),
+                "\"\" and absent must never be confused, on the read side either");
+        }
+
+        [Test]
+        public async Task MappedExceptionBecomesStatusTest()
+        {
+            var store = new SecretStoreMisbehaving
+            {
+                ThrowOnRead = new TimeoutException("the bus went away")
+            };
+
+            SecretResult result = await store.ReadAsync("Test/Key");
+
+            Assert.That(result.Status, Is.EqualTo(SecretStatus.Unavailable));
+            Assert.That(result.Message, Does.Contain("the bus went away"));
+        }
+
+        [Test]
+        public void UnmappedExceptionPropagatesTest()
+        {
+            var store = new SecretStoreMisbehaving
+            {
+                ThrowOnRead = new InvalidOperationException("a programming error")
+            };
+
+            Assert.ThrowsAsync<InvalidOperationException>(
+                async () => await store.ReadAsync("Test/Key"));
+        }
+
+        [Test]
+        public async Task StoreBufferIsZeroedAfterTheCallTest()
+        {
+            var store = new SecretStoreMisbehaving();
+
+            await store.StoreAsync("Test/Key", new byte[] { 1, 2, 3, 4 });
+
+            Assert.That(store.LastStoreBuffer, Is.Not.Null);
+            Assert.That(store.LastStoreBuffer, Is.All.Zero,
+                "The base owns the buffer and must clear it before StoreAsync returns");
+        }
+
+        #endregion
+
+        #region Check Tests
+
+        [Test]
+        public async Task CheckOnHealthyStoreSucceedsTest()
+        {
+            var store = new SecretStoreMemory();
+
+            SecretOutcome outcome = await store.CheckAsync();
+
+            Assert.That(outcome.IsSuccess(), Is.True);
+        }
+
+        [Test]
+        public async Task CheckPassesThroughTheReasonTest()
+        {
+            var store = new SecretStoreMisbehaving
+            {
+                ReadAnswer = new SecretResult { Status = SecretStatus.Unavailable, Message = "no vault" }
+            };
+
+            SecretOutcome outcome = await store.CheckAsync();
+
+            Assert.That(outcome.IsSuccess(), Is.False);
+            Assert.That(outcome.Status, Is.EqualTo(SecretStatus.Unavailable));
+            Assert.That(outcome.Message, Is.EqualTo("no vault"));
+        }
+
+        #endregion
+
         #region Extension Tests
 
         [Test]

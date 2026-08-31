@@ -24,8 +24,8 @@ namespace OutWit.Shared.Secrets.Providers
                 return false;
 
             return Key.Is(other.Key)
-                   && Protection == other.Protection
-                   && CanWrite == other.CanWrite
+                   && Protection.Is(other.Protection)
+                   && CanWrite.Is(other.CanWrite)
                    && Location.Is(other.Location);
         }
 

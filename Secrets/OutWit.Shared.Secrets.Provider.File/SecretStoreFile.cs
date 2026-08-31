@@ -12,9 +12,11 @@ namespace OutWit.Shared.Secrets.Provider.File
     /// <summary>
     /// The explicitly-labelled file fallback — for deployments with no reachable OS credential
     /// store (containers, session-less services). Never selected automatically: configuration
-    /// names it. One file per key with owner-only permissions verified at creation, atomic
-    /// replace via temp-file-and-rename, DPAPI machine-scope protection on Windows and honest
-    /// <see cref="SecretProtection.FileOnly"/> elsewhere.
+    /// names it. One file per key with owner-only permissions applied and verified on the
+    /// temporary file <b>before</b> it is published — a violation leaves the previous value
+    /// untouched — then an atomic rename, followed on POSIX by a directory fsync so the
+    /// durability promise survives a power loss. DPAPI machine-scope protection on Windows
+    /// and honest <see cref="SecretProtection.FileOnly"/> elsewhere.
     /// </summary>
     /// <remarks>
     /// What this does not defend against: an administrator, an attacker running as the owning
@@ -78,23 +80,26 @@ namespace OutWit.Shared.Secrets.Provider.File
         #region Functions
 
         /// <inheritdoc />
-        protected override async Task<SecretOutcome> DoStoreAsync(string key,
-            ReadOnlyMemory<byte> secret, CancellationToken token)
+        protected override async Task<SecretOutcome> DoStoreAsync(string key, byte[] secret,
+            CancellationToken token)
         {
             await m_lock.WaitAsync(token).ConfigureAwait(false);
 
-            byte[]? payload = null;
+            byte[]? envelope = null;
 
             try
             {
                 EnsureDirectory();
 
-                payload = Protect(key, secret);
-                byte[] envelope = SecretStoreFileFormat.Build(
+                byte[] payload = Protect(key, secret);
+                envelope = SecretStoreFileFormat.Build(
                     m_usePlatformKey
                         ? SecretStoreFileFormat.PROTECTION_DPAPI_MACHINE
                         : SecretStoreFileFormat.PROTECTION_NONE,
                     payload);
+
+                if (!ReferenceEquals(payload, secret))
+                    CryptographicOperations.ZeroMemory(payload);
 
                 string path = MapPath(key);
                 string temp = $"{path}.{Guid.NewGuid():N}.tmp";
@@ -107,7 +112,21 @@ namespace OutWit.Shared.Secrets.Provider.File
                         stream.Flush(true);
                     }
 
+                    // Verify on the temp file, before anything is published: a violation
+                    // leaves the previous value untouched instead of replacing it with a
+                    // badly-permissioned one. The rename preserves the permissions.
+                    string? violation = SecretStoreFilePermissions.Verify(temp);
+                    if (violation != null)
+                        return new SecretOutcome
+                        {
+                            Status = SecretStatus.Failed,
+                            Message = $"The permissions read back from '{temp}' are wrong: " +
+                                      $"{violation} Nothing was published; the previous value, " +
+                                      "if any, is untouched."
+                        };
+
                     System.IO.File.Move(temp, path, true);
+                    SecretStoreFileNative.FsyncDirectory(m_directory);
                 }
                 finally
                 {
@@ -115,30 +134,14 @@ namespace OutWit.Shared.Secrets.Provider.File
                         System.IO.File.Delete(temp);
                 }
 
-                string? violation = SecretStoreFilePermissions.Verify(path);
-                if (violation != null)
-                    return new SecretOutcome
-                    {
-                        Status = SecretStatus.Failed,
-                        Message = $"The permissions read back from '{path}' are wrong: {violation}"
-                    };
-
                 CleanupStaleTemp(path);
 
                 return new SecretOutcome { Status = SecretStatus.Found };
             }
-            catch (UnauthorizedAccessException ex)
-            {
-                return new SecretOutcome { Status = SecretStatus.Denied, Message = ex.Message };
-            }
-            catch (IOException ex)
-            {
-                return new SecretOutcome { Status = SecretStatus.Failed, Message = ex.Message };
-            }
             finally
             {
-                if (payload != null)
-                    CryptographicOperations.ZeroMemory(payload);
+                if (envelope != null)
+                    CryptographicOperations.ZeroMemory(envelope);
 
                 m_lock.Release();
             }
@@ -149,31 +152,42 @@ namespace OutWit.Shared.Secrets.Provider.File
         {
             string path = MapPath(key);
 
+            byte[] envelope;
+
             try
             {
-                if (!System.IO.File.Exists(path))
-                    return new SecretResult { Status = SecretStatus.NotFound };
+                // FileShare includes Delete so a concurrent writer's atomic rename (which
+                // needs delete access to the destination) never fails against a reader.
+                var streamOptions = new FileStreamOptions
+                {
+                    Mode = FileMode.Open,
+                    Access = FileAccess.Read,
+                    Share = FileShare.ReadWrite | FileShare.Delete,
+                    Options = FileOptions.Asynchronous
+                };
 
-                byte[] envelope = await System.IO.File.ReadAllBytesAsync(path, token).ConfigureAwait(false);
-
-                if (!SecretStoreFileFormat.TryParse(envelope, out byte protection,
-                        out byte[] payload, out string? error))
-                    return new SecretResult
-                    {
-                        Status = SecretStatus.Failed,
-                        Message = $"'{path}': {error}"
-                    };
-
-                return Unprotect(key, path, protection, payload);
+                using var stream = new FileStream(path, streamOptions);
+                envelope = new byte[stream.Length];
+                await stream.ReadExactlyAsync(envelope, token).ConfigureAwait(false);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (FileNotFoundException)
             {
-                return new SecretResult { Status = SecretStatus.Denied, Message = ex.Message };
+                return new SecretResult { Status = SecretStatus.NotFound };
             }
-            catch (IOException ex)
+            catch (DirectoryNotFoundException)
             {
-                return new SecretResult { Status = SecretStatus.Failed, Message = ex.Message };
+                return new SecretResult { Status = SecretStatus.NotFound };
             }
+
+            if (!SecretStoreFileFormat.TryParse(envelope, out byte protection,
+                    out byte[] payload, out string? error))
+                return new SecretResult
+                {
+                    Status = SecretStatus.Failed,
+                    Message = $"'{path}': {error}"
+                };
+
+            return Unprotect(key, path, protection, payload);
         }
 
         /// <inheritdoc />
@@ -186,19 +200,14 @@ namespace OutWit.Shared.Secrets.Provider.File
                 string path = MapPath(key);
 
                 if (System.IO.File.Exists(path))
+                {
                     System.IO.File.Delete(path);
+                    SecretStoreFileNative.FsyncDirectory(m_directory);
+                }
 
                 CleanupStaleTemp(path);
 
                 return new SecretOutcome { Status = SecretStatus.NotFound };
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return new SecretOutcome { Status = SecretStatus.Denied, Message = ex.Message };
-            }
-            catch (IOException ex)
-            {
-                return new SecretOutcome { Status = SecretStatus.Failed, Message = ex.Message };
             }
             finally
             {
@@ -210,10 +219,25 @@ namespace OutWit.Shared.Secrets.Provider.File
 
         #region Tools
 
+        /// <inheritdoc />
+        protected override (SecretStatus Status, string Message)? MapException(Exception exception)
+        {
+            return exception switch
+            {
+                UnauthorizedAccessException ex => (SecretStatus.Denied, ex.Message),
+                CryptographicException ex => (SecretStatus.Failed,
+                    $"The platform key refused the operation — DPAPI is broken on this " +
+                    $"machine, or the file came from another one: {ex.Message}"),
+                IOException ex => (SecretStatus.Failed, ex.Message),
+                _ => null
+            };
+        }
+
         /// <summary>
-        /// Maps a key to its file name: '/' becomes '.', plus "-{first 8 hex of SHA-256(key)}"
-        /// so the mapping stays injective on case-insensitive file systems, plus ".wsecret".
-        /// Public so support tooling can locate a file.
+        /// Maps a key to its file name: '/' becomes '.', plus
+        /// "-{<see cref="SecretKeys.Fingerprint"/>}" so the mapping stays injective on
+        /// case-insensitive file systems, plus ".wsecret". Public so support tooling can
+        /// locate a file.
         /// </summary>
         /// <param name="key">The secret's key — see <see cref="SecretKeys"/>.</param>
         /// <returns>The file name, without a directory.</returns>
@@ -221,11 +245,7 @@ namespace OutWit.Shared.Secrets.Provider.File
         /// <exception cref="ArgumentException">The key breaks the <see cref="SecretKeys"/> rules.</exception>
         public static string MapFileName(string key)
         {
-            SecretKeys.Validate(key);
-
-            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-            return key.Replace('/', '.') + "-" +
-                   Convert.ToHexString(hash, 0, 4).ToLowerInvariant() + EXTENSION;
+            return key.Replace('/', '.') + "-" + SecretKeys.Fingerprint(key) + EXTENSION;
         }
 
         private string MapPath(string key)
@@ -269,18 +289,28 @@ namespace OutWit.Shared.Secrets.Provider.File
             }
         }
 
-        private byte[] Protect(string key, ReadOnlyMemory<byte> secret)
+        private byte[] Protect(string key, byte[] secret)
         {
             if (m_usePlatformKey && OperatingSystem.IsWindows())
                 return ProtectDpapi(key, secret);
 
-            return secret.ToArray();
+            return secret;
         }
 
         private SecretResult Unprotect(string key, string path, byte protection, byte[] payload)
         {
             if (protection == SecretStoreFileFormat.PROTECTION_NONE)
+            {
+                if (payload.Length == 0)
+                    return new SecretResult
+                    {
+                        Status = SecretStatus.Failed,
+                        Message = $"'{path}' carries an empty payload; it is truncated or " +
+                                  "was not written by this library."
+                    };
+
                 return new SecretResult { Status = SecretStatus.Found, Secret = payload };
+            }
 
             if (protection == SecretStoreFileFormat.PROTECTION_DPAPI_MACHINE)
             {
@@ -319,26 +349,15 @@ namespace OutWit.Shared.Secrets.Provider.File
         }
 
         [SupportedOSPlatform("windows")]
-        private static byte[] ProtectDpapi(string key, ReadOnlyMemory<byte> secret)
+        private static byte[] ProtectDpapi(string key, byte[] secret)
         {
-            byte[] plain = secret.ToArray();
-
-            try
-            {
-                return ProtectedData.Protect(plain, Entropy(key),
-                    DataProtectionScope.LocalMachine);
-            }
-            finally
-            {
-                CryptographicOperations.ZeroMemory(plain);
-            }
+            return ProtectedData.Protect(secret, Entropy(key), DataProtectionScope.LocalMachine);
         }
 
         [SupportedOSPlatform("windows")]
         private static byte[] UnprotectDpapi(string key, byte[] payload)
         {
-            return ProtectedData.Unprotect(payload, Entropy(key),
-                DataProtectionScope.LocalMachine);
+            return ProtectedData.Unprotect(payload, Entropy(key), DataProtectionScope.LocalMachine);
         }
 
         private static byte[] Entropy(string key)

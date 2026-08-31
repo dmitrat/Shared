@@ -1,7 +1,6 @@
 using System;
-using System.Runtime.Versioning;
-using System.Security.Cryptography;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
 using OutWit.Shared.Secrets.Providers;
@@ -19,7 +18,10 @@ namespace OutWit.Shared.Secrets.Provider.Linux
     /// The libsecret password API is string-based, so the payload is stored
     /// <b>base64-encoded</b>; the encoded string is managed memory and cannot be erased —
     /// the same stated trade-off as the string extensions. Attribute matching is exact and
-    /// case-sensitive, so the key maps to the attribute identically, with no suffix.
+    /// case-sensitive, so the key maps to the attribute identically, with no suffix. The
+    /// native calls are synchronous D-Bus round-trips and can stall on an unlock prompt;
+    /// each operation runs on the thread pool so an awaiting UI thread is never blocked, but
+    /// an in-flight call is not interruptible — the token cancels the wait, not the call.
     /// </remarks>
     [SupportedOSPlatform("linux")]
     public sealed class SecretStoreLibsecret : SecretStoreBase
@@ -60,150 +62,134 @@ namespace OutWit.Shared.Secrets.Provider.Linux
         #region Functions
 
         /// <inheritdoc />
-        protected override Task<SecretOutcome> DoStoreAsync(string key, ReadOnlyMemory<byte> secret,
+        protected override Task<SecretOutcome> DoStoreAsync(string key, byte[] secret,
             CancellationToken token)
         {
-            byte[] buffer = secret.ToArray();
-
-            try
-            {
-                string encoded = Convert.ToBase64String(buffer);
-
-                int stored = SecretStoreLibsecretNative.secret_password_store_sync(
-                    Schema(), COLLECTION_DEFAULT, Label(key), encoded, IntPtr.Zero,
-                    out IntPtr error, ATTRIBUTE_KEY, key, IntPtr.Zero);
-
-                string? failure = SecretStoreLibsecretNative.ConsumeError(error);
-                if (failure != null)
-                    return Task.FromResult(new SecretOutcome
-                    {
-                        Status = SecretStatus.Unavailable,
-                        Message = $"The Secret Service refused the store of '{key}': {failure}"
-                    });
-
-                if (stored == 0)
-                    return Task.FromResult(new SecretOutcome
-                    {
-                        Status = SecretStatus.Failed,
-                        Message = $"The Secret Service refused the store of '{key}' without an error."
-                    });
-
-                return Task.FromResult(new SecretOutcome { Status = SecretStatus.Found });
-            }
-            catch (DllNotFoundException)
-            {
-                return Task.FromResult(new SecretOutcome
-                {
-                    Status = SecretStatus.Unavailable,
-                    Message = NO_LIBRARY
-                });
-            }
-            finally
-            {
-                CryptographicOperations.ZeroMemory(buffer);
-            }
+            string encoded = Convert.ToBase64String(secret);
+            return Task.Run(() => StoreCore(key, encoded), token);
         }
 
         /// <inheritdoc />
         protected override Task<SecretResult> DoReadAsync(string key, CancellationToken token)
         {
-            try
-            {
-                IntPtr secretPtr = SecretStoreLibsecretNative.secret_password_lookup_sync(
-                    Schema(), IntPtr.Zero, out IntPtr error,
-                    ATTRIBUTE_KEY, key, IntPtr.Zero);
-
-                string? failure = SecretStoreLibsecretNative.ConsumeError(error);
-                if (failure != null)
-                    return Task.FromResult(new SecretResult
-                    {
-                        Status = SecretStatus.Unavailable,
-                        Message = $"The Secret Service refused the read of '{key}': {failure}"
-                    });
-
-                if (secretPtr == IntPtr.Zero)
-                    return Task.FromResult(new SecretResult { Status = SecretStatus.NotFound });
-
-                string? encoded;
-
-                try
-                {
-                    encoded = Marshal.PtrToStringUTF8(secretPtr);
-                }
-                finally
-                {
-                    SecretStoreLibsecretNative.secret_password_free(secretPtr);
-                }
-
-                if (string.IsNullOrEmpty(encoded))
-                    return Task.FromResult(new SecretResult
-                    {
-                        Status = SecretStatus.Failed,
-                        Message = $"The item for '{key}' carries an empty value; " +
-                                  "it was not written by this library."
-                    });
-
-                try
-                {
-                    return Task.FromResult(new SecretResult
-                    {
-                        Status = SecretStatus.Found,
-                        Secret = Convert.FromBase64String(encoded)
-                    });
-                }
-                catch (FormatException)
-                {
-                    return Task.FromResult(new SecretResult
-                    {
-                        Status = SecretStatus.Failed,
-                        Message = $"The item for '{key}' is not base64; " +
-                                  "it was not written by this library."
-                    });
-                }
-            }
-            catch (DllNotFoundException)
-            {
-                return Task.FromResult(new SecretResult
-                {
-                    Status = SecretStatus.Unavailable,
-                    Message = NO_LIBRARY
-                });
-            }
+            return Task.Run(() => ReadCore(key), token);
         }
 
         /// <inheritdoc />
         protected override Task<SecretOutcome> DoDeleteAsync(string key, CancellationToken token)
         {
+            return Task.Run(() => DeleteCore(key), token);
+        }
+
+        private SecretOutcome StoreCore(string key, string encoded)
+        {
+            int stored = SecretStoreLibsecretNative.secret_password_store_sync(
+                Schema(), COLLECTION_DEFAULT, Label(key), encoded, IntPtr.Zero,
+                out IntPtr error, ATTRIBUTE_KEY, key, IntPtr.Zero);
+
+            if (SecretStoreLibsecretNative.TryConsumeError(error,
+                    out SecretStatus status, out string reason))
+                return new SecretOutcome
+                {
+                    Status = status,
+                    Message = $"The Secret Service refused the store of '{key}': {reason}"
+                };
+
+            if (stored == 0)
+                return new SecretOutcome
+                {
+                    Status = SecretStatus.Failed,
+                    Message = $"The Secret Service refused the store of '{key}' without an error."
+                };
+
+            return new SecretOutcome { Status = SecretStatus.Found };
+        }
+
+        private SecretResult ReadCore(string key)
+        {
+            IntPtr secretPtr = SecretStoreLibsecretNative.secret_password_lookup_sync(
+                Schema(), IntPtr.Zero, out IntPtr error,
+                ATTRIBUTE_KEY, key, IntPtr.Zero);
+
+            if (SecretStoreLibsecretNative.TryConsumeError(error,
+                    out SecretStatus status, out string reason))
+                return new SecretResult
+                {
+                    Status = status,
+                    Message = $"The Secret Service refused the read of '{key}': {reason}"
+                };
+
+            if (secretPtr == IntPtr.Zero)
+                return new SecretResult { Status = SecretStatus.NotFound };
+
+            string? encoded;
+
             try
             {
-                SecretStoreLibsecretNative.secret_password_clear_sync(
-                    Schema(), IntPtr.Zero, out IntPtr error,
-                    ATTRIBUTE_KEY, key, IntPtr.Zero);
-
-                string? failure = SecretStoreLibsecretNative.ConsumeError(error);
-                if (failure != null)
-                    return Task.FromResult(new SecretOutcome
-                    {
-                        Status = SecretStatus.Unavailable,
-                        Message = $"The Secret Service refused the delete of '{key}': {failure}"
-                    });
-
-                // False without an error means nothing matched — delete is idempotent.
-                return Task.FromResult(new SecretOutcome { Status = SecretStatus.NotFound });
+                encoded = Marshal.PtrToStringUTF8(secretPtr);
             }
-            catch (DllNotFoundException)
+            finally
             {
-                return Task.FromResult(new SecretOutcome
-                {
-                    Status = SecretStatus.Unavailable,
-                    Message = NO_LIBRARY
-                });
+                SecretStoreLibsecretNative.secret_password_free(secretPtr);
             }
+
+            if (string.IsNullOrEmpty(encoded))
+                return new SecretResult
+                {
+                    Status = SecretStatus.Failed,
+                    Message = $"The item for '{key}' carries an empty value; " +
+                              "it was not written by this library."
+                };
+
+            try
+            {
+                return new SecretResult
+                {
+                    Status = SecretStatus.Found,
+                    Secret = Convert.FromBase64String(encoded)
+                };
+            }
+            catch (FormatException)
+            {
+                return new SecretResult
+                {
+                    Status = SecretStatus.Failed,
+                    Message = $"The item for '{key}' is not base64; " +
+                              "it was not written by this library."
+                };
+            }
+        }
+
+        private SecretOutcome DeleteCore(string key)
+        {
+            SecretStoreLibsecretNative.secret_password_clear_sync(
+                Schema(), IntPtr.Zero, out IntPtr error,
+                ATTRIBUTE_KEY, key, IntPtr.Zero);
+
+            if (SecretStoreLibsecretNative.TryConsumeError(error,
+                    out SecretStatus status, out string reason))
+                return new SecretOutcome
+                {
+                    Status = status,
+                    Message = $"The Secret Service refused the delete of '{key}': {reason}"
+                };
+
+            // False without an error means nothing matched — delete is idempotent.
+            return new SecretOutcome { Status = SecretStatus.NotFound };
         }
 
         #endregion
 
         #region Tools
+
+        /// <inheritdoc />
+        protected override (SecretStatus Status, string Message)? MapException(Exception exception)
+        {
+            if (exception is DllNotFoundException or EntryPointNotFoundException)
+                return (SecretStatus.Unavailable, NO_LIBRARY);
+
+            return null;
+        }
 
         private static string Label(string key)
         {

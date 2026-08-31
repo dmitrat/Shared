@@ -46,6 +46,19 @@ namespace OutWit.Shared.Secrets.Provider.MacOS
             out uint passwordLength, out IntPtr passwordData,
             out IntPtr itemRef);
 
+        /// <summary>
+        /// Locates an item without requesting its secret: NULL password out-pointers mean no
+        /// decrypt, and therefore no keychain ACL check or user prompt just to find the item —
+        /// the store and delete paths need the reference, not the data.
+        /// </summary>
+        [LibraryImport(SECURITY, EntryPoint = "SecKeychainFindGenericPassword")]
+        internal static partial int SecKeychainFindGenericPasswordRef(
+            IntPtr keychainOrArray,
+            uint serviceNameLength, byte[] serviceName,
+            uint accountNameLength, byte[] accountName,
+            IntPtr passwordLength, IntPtr passwordData,
+            out IntPtr itemRef);
+
         [LibraryImport(SECURITY)]
         internal static partial int SecKeychainItemModifyAttributesAndData(
             IntPtr itemRef, IntPtr attrList, uint length, byte[] data);

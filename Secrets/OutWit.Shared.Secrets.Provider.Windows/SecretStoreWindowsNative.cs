@@ -17,7 +17,6 @@ namespace OutWit.Shared.Secrets.Provider.Windows
         internal const uint CRED_PERSIST_LOCAL_MACHINE = 2;
 
         internal const int ERROR_ACCESS_DENIED = 5;
-        internal const int ERROR_INVALID_PARAMETER = 87;
         internal const int ERROR_NOT_FOUND = 1168;
         internal const int ERROR_NO_SUCH_LOGON_SESSION = 1312;
 

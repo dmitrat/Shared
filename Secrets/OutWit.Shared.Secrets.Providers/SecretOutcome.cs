@@ -24,7 +24,7 @@ namespace OutWit.Shared.Secrets.Providers
             if (modelBase is not SecretOutcome other)
                 return false;
 
-            return Status == other.Status && Message.Is(other.Message);
+            return Status.Is(other.Status) && Message.Is(other.Message);
         }
 
         /// <summary>

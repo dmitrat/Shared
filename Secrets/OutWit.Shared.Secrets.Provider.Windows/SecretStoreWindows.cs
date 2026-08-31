@@ -2,8 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using OutWit.Shared.Secrets.Providers;
@@ -21,7 +19,9 @@ namespace OutWit.Shared.Secrets.Provider.Windows
     /// Whatever provisions a credential at install time must write it as the account that will
     /// read it: an installer running elevated writes into the administrator's vault by default,
     /// and the resulting service cannot read its own credential. Verify with a read, as that
-    /// account, before reporting success.
+    /// account, before reporting success. The native calls are synchronous; each operation runs
+    /// on the thread pool so an awaiting UI thread is never blocked, but an in-flight platform
+    /// call is not interruptible — the token cancels the wait, not the call.
     /// </remarks>
     [SupportedOSPlatform("windows")]
     public sealed class SecretStoreWindows : SecretStoreBase
@@ -51,12 +51,28 @@ namespace OutWit.Shared.Secrets.Provider.Windows
         #region Functions
 
         /// <inheritdoc />
-        protected override Task<SecretOutcome> DoStoreAsync(string key, ReadOnlyMemory<byte> secret,
+        protected override Task<SecretOutcome> DoStoreAsync(string key, byte[] secret,
             CancellationToken token)
+        {
+            return Task.Run(() => StoreCore(key, secret), token);
+        }
+
+        /// <inheritdoc />
+        protected override Task<SecretResult> DoReadAsync(string key, CancellationToken token)
+        {
+            return Task.Run(() => ReadCore(key), token);
+        }
+
+        /// <inheritdoc />
+        protected override Task<SecretOutcome> DoDeleteAsync(string key, CancellationToken token)
+        {
+            return Task.Run(() => DeleteCore(key), token);
+        }
+
+        private SecretOutcome StoreCore(string key, byte[] secret)
         {
             string target = MapKey(key);
 
-            byte[] buffer = secret.ToArray();
             IntPtr blob = IntPtr.Zero;
             IntPtr targetPtr = IntPtr.Zero;
             IntPtr commentPtr = IntPtr.Zero;
@@ -64,8 +80,8 @@ namespace OutWit.Shared.Secrets.Provider.Windows
 
             try
             {
-                blob = Marshal.AllocCoTaskMem(buffer.Length);
-                Marshal.Copy(buffer, 0, blob, buffer.Length);
+                blob = Marshal.AllocCoTaskMem(secret.Length);
+                Marshal.Copy(secret, 0, blob, secret.Length);
 
                 targetPtr = Marshal.StringToCoTaskMemUni(target);
                 commentPtr = Marshal.StringToCoTaskMemUni(COMMENT);
@@ -77,7 +93,7 @@ namespace OutWit.Shared.Secrets.Provider.Windows
                     Type = SecretStoreWindowsNative.CRED_TYPE_GENERIC,
                     TargetName = targetPtr,
                     Comment = commentPtr,
-                    CredentialBlobSize = (uint)buffer.Length,
+                    CredentialBlobSize = (uint)secret.Length,
                     CredentialBlob = blob,
                     Persist = SecretStoreWindowsNative.CRED_PERSIST_LOCAL_MACHINE,
                     AttributeCount = 0,
@@ -89,20 +105,24 @@ namespace OutWit.Shared.Secrets.Provider.Windows
                 if (!SecretStoreWindowsNative.CredWrite(ref credential, 0))
                 {
                     int error = Marshal.GetLastWin32Error();
-                    return Task.FromResult(new SecretOutcome
+                    SecretStatus status = MapError(error);
+
+                    return new SecretOutcome
                     {
-                        Status = MapError(error),
+                        // MapError is a read-oriented table; a write that "was not found"
+                        // wrote nothing and must never look like success.
+                        Status = status == SecretStatus.NotFound ? SecretStatus.Failed : status,
                         Message = Describe("store", error, target)
-                    });
+                    };
                 }
 
-                return Task.FromResult(new SecretOutcome { Status = SecretStatus.Found });
+                return new SecretOutcome { Status = SecretStatus.Found };
             }
             finally
             {
                 if (blob != IntPtr.Zero)
                 {
-                    for (int i = 0; i < buffer.Length; i++)
+                    for (int i = 0; i < secret.Length; i++)
                         Marshal.WriteByte(blob, i, 0);
 
                     Marshal.FreeCoTaskMem(blob);
@@ -116,13 +136,10 @@ namespace OutWit.Shared.Secrets.Provider.Windows
 
                 if (userPtr != IntPtr.Zero)
                     Marshal.FreeCoTaskMem(userPtr);
-
-                CryptographicOperations.ZeroMemory(buffer);
             }
         }
 
-        /// <inheritdoc />
-        protected override Task<SecretResult> DoReadAsync(string key, CancellationToken token)
+        private SecretResult ReadCore(string key)
         {
             string target = MapKey(key);
 
@@ -132,13 +149,13 @@ namespace OutWit.Shared.Secrets.Provider.Windows
                 int error = Marshal.GetLastWin32Error();
 
                 if (error == SecretStoreWindowsNative.ERROR_NOT_FOUND)
-                    return Task.FromResult(new SecretResult { Status = SecretStatus.NotFound });
+                    return new SecretResult { Status = SecretStatus.NotFound };
 
-                return Task.FromResult(new SecretResult
+                return new SecretResult
                 {
                     Status = MapError(error),
                     Message = Describe("read", error, target)
-                });
+                };
             }
 
             try
@@ -146,22 +163,22 @@ namespace OutWit.Shared.Secrets.Provider.Windows
                 var credential = Marshal.PtrToStructure<SecretStoreWindowsNative.CREDENTIALW>(credentialPtr);
 
                 if (credential.CredentialBlob == IntPtr.Zero || credential.CredentialBlobSize == 0)
-                    return Task.FromResult(new SecretResult
+                    return new SecretResult
                     {
                         Status = SecretStatus.Failed,
                         Message = $"The credential '{target}' carries an empty blob; " +
                                   "it was not written by this library."
-                    });
+                    };
 
                 int length = checked((int)credential.CredentialBlobSize);
                 byte[] secret = new byte[length];
                 Marshal.Copy(credential.CredentialBlob, secret, 0, length);
 
-                return Task.FromResult(new SecretResult
+                return new SecretResult
                 {
                     Status = SecretStatus.Found,
                     Secret = secret
-                });
+                };
             }
             finally
             {
@@ -169,8 +186,7 @@ namespace OutWit.Shared.Secrets.Provider.Windows
             }
         }
 
-        /// <inheritdoc />
-        protected override Task<SecretOutcome> DoDeleteAsync(string key, CancellationToken token)
+        private SecretOutcome DeleteCore(string key)
         {
             string target = MapKey(key);
 
@@ -180,14 +196,14 @@ namespace OutWit.Shared.Secrets.Provider.Windows
                 int error = Marshal.GetLastWin32Error();
 
                 if (error != SecretStoreWindowsNative.ERROR_NOT_FOUND)
-                    return Task.FromResult(new SecretOutcome
+                    return new SecretOutcome
                     {
                         Status = MapError(error),
                         Message = Describe("delete", error, target)
-                    });
+                    };
             }
 
-            return Task.FromResult(new SecretOutcome { Status = SecretStatus.NotFound });
+            return new SecretOutcome { Status = SecretStatus.NotFound };
         }
 
         #endregion
@@ -196,8 +212,8 @@ namespace OutWit.Shared.Secrets.Provider.Windows
 
         /// <summary>
         /// Maps a key to its Credential Manager target name:
-        /// "{key}#{first 8 hex of SHA-256(key)}". Target names are case-insensitive on
-        /// Windows, so an identity mapping is not injective; the suffix keeps two keys
+        /// "{key}#{<see cref="SecretKeys.Fingerprint"/>}". Target names are case-insensitive
+        /// on Windows, so an identity mapping is not injective; the suffix keeps two keys
         /// differing only in case apart, while the prefix keeps the entry findable in the
         /// Credential Manager UI. Public so support tooling can locate an entry.
         /// </summary>
@@ -207,10 +223,7 @@ namespace OutWit.Shared.Secrets.Provider.Windows
         /// <exception cref="ArgumentException">The key breaks the <see cref="SecretKeys"/> rules.</exception>
         public static string MapKey(string key)
         {
-            SecretKeys.Validate(key);
-
-            byte[] hash = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-            return key + "#" + Convert.ToHexString(hash, 0, 4).ToLowerInvariant();
+            return key + "#" + SecretKeys.Fingerprint(key);
         }
 
         private static SecretStatus MapError(int error)

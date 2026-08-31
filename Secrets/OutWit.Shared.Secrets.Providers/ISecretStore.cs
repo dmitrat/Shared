@@ -59,5 +59,16 @@ namespace OutWit.Shared.Secrets.Providers
         /// <exception cref="ArgumentNullException">The key is null.</exception>
         /// <exception cref="ArgumentException">The key breaks the <see cref="SecretKeys"/> rules.</exception>
         Task<SecretOutcome> DeleteAsync(string key, CancellationToken token = default);
+
+        /// <summary>
+        /// Probes whether the store opens at all, so a host can gate at startup — log the
+        /// <see cref="Description"/>, call this, refuse to run on an answer it cannot
+        /// accept — instead of discovering a missing Secret Service or vault at the first
+        /// credential read, hours later, mid-request.
+        /// </summary>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>An outcome whose <see cref="SecretOutcome.IsSuccess"/> says whether the
+        /// store is reachable; otherwise the status and message say why not.</returns>
+        Task<SecretOutcome> CheckAsync(CancellationToken token = default);
     }
 }

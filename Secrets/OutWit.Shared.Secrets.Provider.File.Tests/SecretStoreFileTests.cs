@@ -166,6 +166,28 @@ namespace OutWit.Shared.Secrets.Provider.File.Tests
         }
 
         [Test]
+        public async Task TruncatedEnvelopeIsFailedNotFoundWithEmptySecretTest()
+        {
+            var store = new SecretStoreFile(new SecretStoreFileOptions
+            {
+                DirectoryPath = m_directory,
+                UsePlatformKey = false
+            });
+
+            string key = "Test/Truncated";
+            string path = Path.Combine(m_directory, SecretStoreFile.MapFileName(key));
+
+            Directory.CreateDirectory(m_directory);
+            byte[] headerOnly = { (byte)'W', (byte)'S', (byte)'E', (byte)'C', 1, 0, 0, 0 };
+            await IOFile.WriteAllBytesAsync(path, headerOnly);
+
+            SecretResult result = await store.ReadAsync(key);
+
+            Assert.That(result.Status, Is.EqualTo(SecretStatus.Failed),
+                "A truncated envelope must never read as Found-with-empty or as NotFound");
+        }
+
+        [Test]
         public async Task NewerFormatVersionIsFailedWithVersionsNamedTest()
         {
             string key = "Test/Newer";

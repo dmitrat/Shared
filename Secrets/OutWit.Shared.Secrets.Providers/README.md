@@ -37,8 +37,12 @@ the rules below.
 ```csharp
 ISecretStore store = /* register a provider at the composition root */;
 
-// Log once at startup what you actually got:
+// Log once at startup what you actually got, and that it opens at all —
+// don't discover a missing vault at the first credential read, hours later:
 logger.LogInformation("Secret store: {Description}", store.Description);
+var check = await store.CheckAsync();
+if (!check.IsSuccess())
+    logger.LogError("Secret store unreachable: {Status} {Message}", check.Status, check.Message);
 
 var result = await store.ReadAsync("MyProduct/ApiKey");
 switch (result.Status)
@@ -67,6 +71,27 @@ cloning. It raises reading a credential from *"open the config file"* to
 *"obtain administrative control of the machine or its disk"* — design everything
 downstream of the credential on the assumption that the second is possible:
 keep stored credentials centrally revocable.
+
+## Migrating a credential out of settings
+
+For a product that already keeps a credential in a settings file, the move is
+five lines and a decision:
+
+```csharp
+string? legacy = settings.ApiKey;                  // the plaintext settings value
+if (!string.IsNullOrEmpty(legacy))
+{
+    await store.StoreStringAsync("MyProduct/ApiKey", legacy);
+    settings.ApiKey = "";                          // overwrite, then save
+    settings.Save();
+}
+```
+
+**The caveat that matters:** the old value survives in backups, in the file's
+free space, in support bundles already collected, and in any version-controlled
+copy. Migration therefore ends with **rotating the credential**, not with moving
+it. A secret that has been in a plaintext settings file is a secret that has
+been disclosed.
 
 ## Uninstall
 
