@@ -99,6 +99,10 @@ jobs:
               - 'Secrets/OutWit.Shared.Secrets.Providers/**'
               - 'Secrets/OutWit.Shared.Secrets.Conformance/**'
               - '.github/workflows/ci.yml'
+            OutWit.Shared.Secrets.Settings:
+              - 'Secrets/OutWit.Shared.Secrets.Settings/**'
+              - 'Secrets/OutWit.Shared.Secrets.Settings.Tests/**'
+              - 'Secrets/OutWit.Shared.Secrets.Providers/**'
             OutWit.Shared.Secrets.Desktop:
               - 'Secrets/**'
 

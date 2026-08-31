@@ -29,6 +29,7 @@ on:
           - OutWit.Shared.Secrets.Provider.File
           - OutWit.Shared.Secrets.Provider.Linux
           - OutWit.Shared.Secrets.Provider.MacOS
+          - OutWit.Shared.Secrets.Settings
           - OutWit.Shared.Secrets.Desktop
           - OutWit.Shared.Blazor.Shell
       pushToNuGet:

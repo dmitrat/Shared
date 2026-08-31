@@ -51,6 +51,8 @@
     <Project Path="Secrets/OutWit.Shared.Secrets.Provider.Windows.Tests/OutWit.Shared.Secrets.Provider.Windows.Tests.csproj" />
     <Project Path="Secrets/OutWit.Shared.Secrets.Providers/OutWit.Shared.Secrets.Providers.csproj" />
     <Project Path="Secrets/OutWit.Shared.Secrets.Providers.Tests/OutWit.Shared.Secrets.Providers.Tests.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Settings/OutWit.Shared.Secrets.Settings.csproj" />
+    <Project Path="Secrets/OutWit.Shared.Secrets.Settings.Tests/OutWit.Shared.Secrets.Settings.Tests.csproj" />
   </Folder>
   <Folder Name="/Logging/">
     <Project Path="Logging/OutWit.Shared.Logging.Blazor/OutWit.Shared.Logging.Blazor.csproj" />
