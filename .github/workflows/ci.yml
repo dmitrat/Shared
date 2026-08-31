@@ -175,9 +175,12 @@ jobs:
         run: dotnet restore Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/OutWit.Shared.Secrets.Provider.Linux.Tests.csproj
 
       - name: Test under an unlocked keyring
+        # The password must be non-empty and newline-terminated: --unlock creates the
+        # login collection when it does not exist, but silently does not with an empty
+        # password — the daemon then answers and the default alias points at nothing.
         run: |
           dbus-run-session -- bash -c '
-            echo -n "" | gnome-keyring-daemon --unlock --replace --components=secrets
+            eval "$(printf "ci-keyring\n" | gnome-keyring-daemon --unlock --replace --components=secrets)"
             dotnet test Secrets/OutWit.Shared.Secrets.Provider.Linux.Tests/OutWit.Shared.Secrets.Provider.Linux.Tests.csproj --configuration Release --no-restore
           '
 
